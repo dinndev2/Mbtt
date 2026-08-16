@@ -15,7 +15,7 @@ The island main city has various of transportation vihicles that can offer rangi
   Habal
   Bus
   Mini Jeep
-  
+  Ferry
 
 Transportation vihicles above are accesible within the city
 
