@@ -1,0 +1,914 @@
+<title>Mbtt Schema Map</title>
+
+<style>
+  :root {
+    --ground:    #E8EBEF;
+    --surface:   #FFFFFF;
+    --sunken:    #DDE2E8;
+    --ink:       #141A22;
+    --ink-mute:  #5A6472;
+    --ink-faint: #8B94A1;
+    --rule:      #C3CAD3;
+    --rule-soft: #D8DDE4;
+
+    --rel-fk:     #0F6E52;
+    --rel-app:    #B4451A;
+    --feed:       #6D1F55;
+    --accent:     #1B4FCC;
+
+    --font-display: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --font-prose:   "Iowan Old Style", Palatino, "Palatino Linotype", Georgia, serif;
+    --font-ui:      ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-data:    ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+
+    --measure: 66ch;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:    #101419;
+      --surface:   #191F27;
+      --sunken:    #141920;
+      --ink:       #E4E9EF;
+      --ink-mute:  #9AA5B3;
+      --ink-faint: #6B7684;
+      --rule:      #2E3742;
+      --rule-soft: #232B34;
+
+      --rel-fk:   #3FBF93;
+      --rel-app:  #F0873F;
+      --feed:     #D07BB4;
+      --accent:   #7BA0F5;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground:    #101419;
+    --surface:   #191F27;
+    --sunken:    #141920;
+    --ink:       #E4E9EF;
+    --ink-mute:  #9AA5B3;
+    --ink-faint: #6B7684;
+    --rule:      #2E3742;
+    --rule-soft: #232B34;
+
+    --rel-fk:   #3FBF93;
+    --rel-app:  #F0873F;
+    --feed:     #D07BB4;
+    --accent:   #7BA0F5;
+  }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-ui);
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  code {
+    font-family: var(--font-data);
+    font-size: 0.87em;
+  }
+
+  .wrap {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+    display: flex;
+    flex-direction: column;
+    gap: 52px;
+  }
+
+  /* ---------- masthead ---------- */
+
+  .masthead { display: flex; flex-direction: column; gap: 14px; }
+
+  .eyebrow {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(38px, 6vw, 60px);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 0.98;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  .dek {
+    font-family: var(--font-prose);
+    font-size: 18px;
+    line-height: 1.5;
+    color: var(--ink-mute);
+    max-width: var(--measure);
+    margin: 0;
+  }
+
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    border-top: 1px solid var(--rule);
+    margin-top: 8px;
+  }
+
+  .fact {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 14px 28px 14px 0;
+    margin-right: 28px;
+    border-right: 1px solid var(--rule-soft);
+  }
+  .fact:last-child { border-right: 0; margin-right: 0; }
+
+  .fact dt {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .fact dd {
+    margin: 0;
+    font-family: var(--font-data);
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+
+  /* ---------- figure ---------- */
+
+  figure { margin: 0; display: flex; flex-direction: column; gap: 0; }
+
+  .canvas {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 20px;
+    overflow-x: auto;
+  }
+
+  .canvas svg {
+    display: block;
+    width: 100%;
+    min-width: 900px;
+    height: auto;
+    color: var(--ink);
+  }
+
+  figcaption {
+    font-family: var(--font-prose);
+    font-size: 14.5px;
+    line-height: 1.5;
+    color: var(--ink-mute);
+    padding-top: 14px;
+    max-width: var(--measure);
+  }
+
+  /* svg element classes */
+  .n-rect  { fill: var(--surface); stroke: var(--rule); stroke-width: 1.5; }
+  .n-hub   { stroke: var(--ink); stroke-width: 2; }
+  .n-tick  { fill: var(--feed); }
+  .n-name  { font-family: var(--font-display); font-size: 13px; font-weight: 700; letter-spacing: -0.01em; fill: var(--ink); }
+  .n-col   { font-family: var(--font-data); font-size: 10px; fill: var(--ink-mute); }
+
+  .e-fk    { fill: none; stroke: var(--rel-fk);  stroke-width: 2; }
+  .e-app   { fill: none; stroke: var(--rel-app); stroke-width: 2; stroke-dasharray: 6 4; }
+  .e-label { font-family: var(--font-data); font-size: 10px; }
+  .l-fk    { fill: var(--rel-fk); }
+  .l-app   { fill: var(--rel-app); }
+
+  .m-fk   { fill: var(--rel-fk); }
+  .m-app  { fill: var(--rel-app); }
+
+  /* ---------- key ---------- */
+
+  .key {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 26px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule-soft);
+    margin-top: 16px;
+  }
+  .key-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 12.5px;
+    color: var(--ink-mute);
+  }
+  .swatch { width: 26px; height: 0; border-top-width: 2px; flex: none; }
+  .sw-fk   { border-top-style: solid;  border-top-color: var(--rel-fk); }
+  .sw-app  { border-top-style: dashed; border-top-color: var(--rel-app); }
+  .sw-feed {
+    width: 4px; height: 15px;
+    background: var(--feed);
+    border: 0;
+    flex: none;
+  }
+  .sw-hub {
+    width: 22px; height: 13px;
+    border: 2px solid var(--ink);
+    border-radius: 2px;
+    flex: none;
+  }
+
+  /* ---------- sections ---------- */
+
+  section { display: flex; flex-direction: column; gap: 20px; }
+
+  h2 {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin: 0;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .lede {
+    font-family: var(--font-prose);
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--ink-mute);
+    max-width: var(--measure);
+    margin: -6px 0 0;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(268px, 1fr));
+    gap: 16px;
+    align-items: start;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .card-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 13px 15px;
+    border-bottom: 1px solid var(--rule-soft);
+    border-left: 3px solid var(--stripe, var(--rule));
+  }
+  .card-head h3 {
+    font-family: var(--font-data);
+    font-size: 14px;
+    font-weight: 700;
+    margin: 0;
+    color: var(--ink);
+  }
+  .card-head .tag {
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--stripe, var(--ink-faint));
+    white-space: nowrap;
+  }
+
+  .cols { display: flex; flex-direction: column; }
+
+  .col {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: baseline;
+    padding: 6px 15px;
+    font-family: var(--font-data);
+    font-size: 12px;
+  }
+  .col + .col { border-top: 1px solid var(--rule-soft); }
+  .col .cn { color: var(--ink); }
+  .col .ct { color: var(--ink-faint); font-size: 11px; text-align: right; }
+  .col .k {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 1px 4px;
+    border-radius: 2px;
+    background: var(--sunken);
+    color: var(--ink-mute);
+    margin-left: 5px;
+  }
+
+  .card-note {
+    padding: 10px 15px 13px;
+    font-family: var(--font-prose);
+    font-size: 12.5px;
+    line-height: 1.45;
+    color: var(--ink-mute);
+    border-top: 1px solid var(--rule-soft);
+  }
+
+  /* ---------- decisions ---------- */
+
+  .decisions { display: flex; flex-direction: column; gap: 0; }
+
+  .decision {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .decision:first-child { border-top: 1px solid var(--rule-soft); }
+
+  .decision h3 {
+    font-family: var(--font-ui);
+    font-size: 15.5px;
+    font-weight: 650;
+    margin: 0;
+    color: var(--ink);
+    letter-spacing: -0.005em;
+  }
+  .decision p {
+    margin: 0;
+    font-family: var(--font-prose);
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: var(--ink-mute);
+    max-width: var(--measure);
+  }
+  .decision code {
+    font-family: var(--font-data);
+    font-size: 12.5px;
+    background: var(--sunken);
+    padding: 1px 5px;
+    border-radius: 2px;
+    color: var(--ink);
+  }
+
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--tone, var(--ink-faint));
+    align-self: flex-start;
+  }
+  .status::before {
+    content: "";
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--tone, var(--ink-faint));
+    flex: none;
+  }
+
+  footer {
+    font-family: var(--font-prose);
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--ink-faint);
+    border-top: 1px solid var(--rule);
+    padding-top: 20px;
+    max-width: var(--measure);
+  }
+  footer code {
+    font-family: var(--font-data);
+    font-size: 12px;
+    color: var(--ink-mute);
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="eyebrow">Mbtt · backend · Rails 8</div>
+    <h1>Schema Map</h1>
+    <p class="dek">Sixteen tables along one spine. Ten of them mirror a GTFS file column for column, so
+      the hand-collected feed in <code>data/gtfs/</code> loads without translation; the other six are
+      the island's own — modes, destinations, and who rode what. Read from
+      <code>db/schema.rb</code> at version 2026_08_17_091000.</p>
+
+    <dl class="facts">
+      <div class="fact"><dt>Tables</dt><dd>16</dd></div>
+      <div class="fact"><dt>DB foreign keys</dt><dd>16</dd></div>
+      <div class="fact"><dt>GTFS-mirrored</dt><dd>10</dd></div>
+      <div class="fact"><dt>App-level only</dt><dd>1</dd></div>
+      <div class="fact"><dt>Migrations</dt><dd>18</dd></div>
+    </dl>
+  </header>
+
+  <figure>
+    <div class="canvas">
+      <svg viewBox="0 0 1100 580" role="img"
+           aria-label="Entity relationship map. A left-to-right spine runs agencies, routes, trips,
+                       stop_times, stops. Vihicles feeds routes from above and services feeds trips,
+                       with service_exceptions hanging off services. Frequencies, fares and fare_rules
+                       sit below the spine, places and categories below stops, and users and histories
+                       at the lower left. Every relation is a database foreign key except users to
+                       histories, which is declared in the models only.">
+        <defs>
+          <marker id="ar-fk" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <polygon class="m-fk" points="0,1 10,5 0,9" />
+          </marker>
+          <marker id="ar-app" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <polygon class="m-app" points="0,1 10,5 0,9" />
+          </marker>
+        </defs>
+
+        <!-- edges: the spine -->
+        <path class="e-fk" d="M190,244 H250" marker-end="url(#ar-fk)" />
+        <text class="e-label l-fk" x="220" y="236" text-anchor="middle">agency_id</text>
+
+        <path class="e-fk" d="M400,244 H460" marker-end="url(#ar-fk)" />
+        <text class="e-label l-fk" x="430" y="236" text-anchor="middle">route_id</text>
+
+        <path class="e-fk" d="M610,244 H670" marker-end="url(#ar-fk)" />
+        <text class="e-label l-fk" x="640" y="236" text-anchor="middle">trip_id</text>
+
+        <path class="e-fk" d="M820,244 H880" marker-end="url(#ar-fk)" />
+        <text class="e-label l-fk" x="850" y="236" text-anchor="middle">stop_id</text>
+
+        <!-- edges: feeding the spine from above -->
+        <path class="e-fk" d="M325,148 V210" marker-end="url(#ar-fk)" />
+        <text class="e-label l-fk" x="333" y="182">vihicle_id</text>
+
+        <path class="e-fk" d="M535,148 V210" marker-end="url(#ar-fk)" />
+        <text class="e-label l-fk" x="543" y="182">service_id</text>
+
+        <path class="e-fk" d="M670,114 H610" marker-end="url(#ar-fk)" />
+        <text class="e-label l-fk" x="640" y="106" text-anchor="middle">service_id</text>
+
+        <!-- edges: hanging below the spine -->
+        <path class="e-fk" d="M535,350 V278" marker-end="url(#ar-fk)" />
+        <text class="e-label l-fk" x="543" y="318">trip_id</text>
+
+        <path class="e-fk" d="M325,350 V278" marker-end="url(#ar-fk)" />
+        <text class="e-label l-fk" x="333" y="318">route_id</text>
+
+        <path class="e-fk" d="M115,350 V278" marker-end="url(#ar-fk)" />
+        <text class="e-label l-fk" x="123" y="318">agency_id</text>
+
+        <path class="e-fk" d="M190,384 H250" marker-end="url(#ar-fk)" />
+        <text class="e-label l-fk" x="220" y="376" text-anchor="middle">fare_id</text>
+
+        <path class="e-fk" d="M955,350 V278" marker-end="url(#ar-fk)" />
+        <text class="e-label l-fk" x="963" y="318">stop_id</text>
+
+        <!-- edges: places and categories -->
+        <path class="e-fk" d="M820,504 H880" marker-end="url(#ar-fk)" />
+        <text class="e-label l-fk" x="850" y="496" text-anchor="middle">category_id</text>
+
+        <path class="e-fk" d="M745,470 V384 H880" marker-end="url(#ar-fk)" />
+        <text class="e-label l-fk" x="753" y="434">place_id</text>
+
+        <!-- edges: people -->
+        <path class="e-fk" d="M400,504 H430 V320 H500 V278" marker-end="url(#ar-fk)" />
+        <text class="e-label l-fk" x="438" y="424">trip_id</text>
+
+        <path class="e-app" d="M190,504 H250" marker-end="url(#ar-app)" />
+        <text class="e-label l-app" x="220" y="496" text-anchor="middle">user_id</text>
+
+        <!-- edge: stops self-reference -->
+        <path class="e-fk" d="M1010,210 V186 H1054 V250 H1030" marker-end="url(#ar-fk)" />
+        <text class="e-label l-fk" x="1048" y="180" text-anchor="end">parent_stop_id</text>
+
+        <!-- nodes: the spine -->
+        <rect class="n-rect" x="40" y="210" width="150" height="68" rx="4" />
+        <rect class="n-tick" x="40" y="210" width="3" height="68" />
+        <text class="n-name" x="56" y="236">agencies</text>
+        <text class="n-col"  x="56" y="254">gtfs_id · uk</text>
+        <text class="n-col"  x="56" y="269">timezone</text>
+
+        <rect class="n-rect" x="250" y="210" width="150" height="68" rx="4" />
+        <rect class="n-tick" x="250" y="210" width="3" height="68" />
+        <text class="n-name" x="266" y="236">routes</text>
+        <text class="n-col"  x="266" y="254">gtfs_id · uk</text>
+        <text class="n-col"  x="266" y="269">route_type 3 | 4</text>
+
+        <rect class="n-rect n-hub" x="460" y="210" width="150" height="68" rx="4" />
+        <rect class="n-tick" x="460" y="210" width="3" height="68" />
+        <text class="n-name" x="476" y="236">trips</text>
+        <text class="n-col"  x="476" y="254">gtfs_id · uk</text>
+        <text class="n-col"  x="476" y="269">headsign · direction</text>
+
+        <rect class="n-rect" x="670" y="210" width="150" height="68" rx="4" />
+        <rect class="n-tick" x="670" y="210" width="3" height="68" />
+        <text class="n-name" x="686" y="236">stop_times</text>
+        <text class="n-col"  x="686" y="254">stop_sequence</text>
+        <text class="n-col"  x="686" y="269">arrival · departure</text>
+
+        <rect class="n-rect" x="880" y="210" width="150" height="68" rx="4" />
+        <rect class="n-tick" x="880" y="210" width="3" height="68" />
+        <text class="n-name" x="896" y="236">stops</text>
+        <text class="n-col"  x="896" y="254">lat · lon · zone</text>
+        <text class="n-col"  x="896" y="269">location_type</text>
+
+        <!-- nodes: above the spine -->
+        <rect class="n-rect" x="250" y="80" width="150" height="68" rx="4" />
+        <text class="n-name" x="266" y="106">vihicles</text>
+        <text class="n-col"  x="266" y="124">slug · uk</text>
+        <text class="n-col"  x="266" y="139">route_type 3 | 4</text>
+
+        <rect class="n-rect" x="460" y="80" width="150" height="68" rx="4" />
+        <rect class="n-tick" x="460" y="80" width="3" height="68" />
+        <text class="n-name" x="476" y="106">services</text>
+        <text class="n-col"  x="476" y="124">monday … sunday</text>
+        <text class="n-col"  x="476" y="139">start · end date</text>
+
+        <rect class="n-rect" x="670" y="80" width="150" height="68" rx="4" />
+        <rect class="n-tick" x="670" y="80" width="3" height="68" />
+        <text class="n-name" x="686" y="106">service_exceptions</text>
+        <text class="n-col"  x="686" y="124">date</text>
+        <text class="n-col"  x="686" y="139">exception_type</text>
+
+        <!-- nodes: below the spine -->
+        <rect class="n-rect" x="40" y="350" width="150" height="68" rx="4" />
+        <rect class="n-tick" x="40" y="350" width="3" height="68" />
+        <text class="n-name" x="56" y="376">fares</text>
+        <text class="n-col"  x="56" y="394">price · currency</text>
+        <text class="n-col"  x="56" y="409">payment_method</text>
+
+        <rect class="n-rect" x="250" y="350" width="150" height="68" rx="4" />
+        <rect class="n-tick" x="250" y="350" width="3" height="68" />
+        <text class="n-name" x="266" y="376">fare_rules</text>
+        <text class="n-col"  x="266" y="394">origin · dest zone</text>
+        <text class="n-col"  x="266" y="409">contains_zone</text>
+
+        <rect class="n-rect" x="460" y="350" width="150" height="68" rx="4" />
+        <rect class="n-tick" x="460" y="350" width="3" height="68" />
+        <text class="n-name" x="476" y="376">frequencies</text>
+        <text class="n-col"  x="476" y="394">headway_secs</text>
+        <text class="n-col"  x="476" y="409">exact_times</text>
+
+        <rect class="n-rect" x="880" y="350" width="150" height="68" rx="4" />
+        <text class="n-name" x="896" y="376">places</text>
+        <text class="n-col"  x="896" y="394">lat · lon</text>
+        <text class="n-col"  x="896" y="409">image_url</text>
+
+        <!-- nodes: lower band -->
+        <rect class="n-rect" x="40" y="470" width="150" height="68" rx="4" />
+        <text class="n-name" x="56" y="496">users</text>
+        <text class="n-col"  x="56" y="514">name</text>
+        <text class="n-col"  x="56" y="529">commuter_type</text>
+
+        <rect class="n-rect" x="250" y="470" width="150" height="68" rx="4" />
+        <text class="n-name" x="266" y="496">histories</text>
+        <text class="n-col"  x="266" y="514">user_id · trip_id</text>
+
+        <rect class="n-rect" x="670" y="470" width="150" height="68" rx="4" />
+        <text class="n-name" x="686" y="496">place_categories</text>
+        <text class="n-col"  x="686" y="514">place_id</text>
+        <text class="n-col"  x="686" y="529">category_id</text>
+
+        <rect class="n-rect" x="880" y="470" width="150" height="68" rx="4" />
+        <text class="n-name" x="896" y="496">categories</text>
+        <text class="n-col"  x="896" y="514">name · slug · uk</text>
+      </svg>
+    </div>
+
+    <div class="key">
+      <div class="key-item"><span class="swatch sw-fk"></span> Foreign key enforced by the database</div>
+      <div class="key-item"><span class="swatch sw-app"></span> Association declared in the model only</div>
+      <div class="key-item"><span class="sw-feed"></span> Mirrors a GTFS file</div>
+      <div class="key-item"><span class="sw-hub"></span> Hub</div>
+    </div>
+
+    <figcaption>The spine reads left to right the way a journey is described: an operator runs a route,
+      the route has runs, a run calls at stops in order. <code>trips</code> is the hub — six tables
+      reach it, and it is the only place a schedule, a headway and a rider's history all meet.
+      Everything here is a real database constraint except <code>users → histories</code>.</figcaption>
+  </figure>
+
+  <section>
+    <h2>GTFS-derived tables</h2>
+    <p class="lede">One table per file in <code>data/gtfs/</code>. Each keeps the feed's own identifier
+      in a unique <code>gtfs_id</code>, which is what a re-import matches on so rows update instead of
+      duplicating.</p>
+    <div class="grid">
+
+      <article class="card" style="--stripe: var(--feed);">
+        <div class="card-head"><h3>agencies</h3><span class="tag">agency.txt</span></div>
+        <div class="cols">
+          <div class="col"><span class="cn">id<span class="k">PK</span></span><span class="ct">bigint</span></div>
+          <div class="col"><span class="cn">gtfs_id<span class="k">UK</span></span><span class="ct">string · not null</span></div>
+          <div class="col"><span class="cn">name</span><span class="ct">string · not null</span></div>
+          <div class="col"><span class="cn">url</span><span class="ct">string</span></div>
+          <div class="col"><span class="cn">timezone</span><span class="ct">string · Asia/Manila</span></div>
+          <div class="col"><span class="cn">lang · phone · email</span><span class="ct">string</span></div>
+        </div>
+        <p class="card-note">Informal modes get an umbrella agency, since <code>routes.agency_id</code>
+          is required and habal drivers have no operator.</p>
+      </article>
+
+      <article class="card" style="--stripe: var(--feed);">
+        <div class="card-head"><h3>routes</h3><span class="tag">routes.txt</span></div>
+        <div class="cols">
+          <div class="col"><span class="cn">id<span class="k">PK</span></span><span class="ct">bigint</span></div>
+          <div class="col"><span class="cn">gtfs_id<span class="k">UK</span></span><span class="ct">string · not null</span></div>
+          <div class="col"><span class="cn">agency_id<span class="k">FK</span></span><span class="ct">not null</span></div>
+          <div class="col"><span class="cn">vihicle_id<span class="k">FK</span></span><span class="ct">not null</span></div>
+          <div class="col"><span class="cn">short_name · long_name</span><span class="ct">string</span></div>
+          <div class="col"><span class="cn">description</span><span class="ct">text</span></div>
+          <div class="col"><span class="cn">route_type</span><span class="ct">integer · default 3</span></div>
+          <div class="col"><span class="cn">color · text_color</span><span class="ct">string</span></div>
+        </div>
+        <p class="card-note">A named origin–destination service for one mode. Validates that at least
+          one of the two names is present.</p>
+      </article>
+
+      <article class="card" style="--stripe: var(--ink);">
+        <div class="card-head"><h3>trips</h3><span class="tag">Hub · trips.txt</span></div>
+        <div class="cols">
+          <div class="col"><span class="cn">id<span class="k">PK</span></span><span class="ct">bigint</span></div>
+          <div class="col"><span class="cn">gtfs_id<span class="k">UK</span></span><span class="ct">string</span></div>
+          <div class="col"><span class="cn">route_id<span class="k">FK</span></span><span class="ct">integer</span></div>
+          <div class="col"><span class="cn">service_id<span class="k">FK</span></span><span class="ct">integer</span></div>
+          <div class="col"><span class="cn">headsign</span><span class="ct">string</span></div>
+          <div class="col"><span class="cn">direction</span><span class="ct">integer · default 0</span></div>
+        </div>
+        <p class="card-note">One real departure for a timetabled mode, or one representative run for a
+          mode that leaves when full. <code>Trip#departure</code> and <code>#arrival</code> are read
+          from <code>stop_times</code>, not stored.</p>
+      </article>
+
+      <article class="card" style="--stripe: var(--feed);">
+        <div class="card-head"><h3>stop_times</h3><span class="tag">stop_times.txt</span></div>
+        <div class="cols">
+          <div class="col"><span class="cn">id<span class="k">PK</span></span><span class="ct">bigint</span></div>
+          <div class="col"><span class="cn">trip_id<span class="k">FK</span></span><span class="ct">not null</span></div>
+          <div class="col"><span class="cn">stop_id<span class="k">FK</span></span><span class="ct">not null</span></div>
+          <div class="col"><span class="cn">stop_sequence<span class="k">UK</span></span><span class="ct">integer · per trip</span></div>
+          <div class="col"><span class="cn">arrival_time</span><span class="ct">time · null</span></div>
+          <div class="col"><span class="cn">departure_time</span><span class="ct">time · null</span></div>
+          <div class="col"><span class="cn">pickup_type</span><span class="ct">integer · default 0</span></div>
+          <div class="col"><span class="cn">drop_off_type</span><span class="ct">integer · default 0</span></div>
+          <div class="col"><span class="cn">timepoint</span><span class="ct">boolean · false</span></div>
+          <div class="col"><span class="cn">shape_dist_traveled</span><span class="ct">decimal 8,3</span></div>
+        </div>
+        <p class="card-note">Times are nullable at unsurveyed intermediate stops.
+          <code>timepoint: false</code> is the honest default — a survey time is an estimate until
+          someone claims otherwise.</p>
+      </article>
+
+      <article class="card" style="--stripe: var(--feed);">
+        <div class="card-head"><h3>stops</h3><span class="tag">stops.txt</span></div>
+        <div class="cols">
+          <div class="col"><span class="cn">id<span class="k">PK</span></span><span class="ct">bigint</span></div>
+          <div class="col"><span class="cn">gtfs_id<span class="k">UK</span></span><span class="ct">string · not null</span></div>
+          <div class="col"><span class="cn">code</span><span class="ct">string</span></div>
+          <div class="col"><span class="cn">name</span><span class="ct">string · not null</span></div>
+          <div class="col"><span class="cn">description</span><span class="ct">text</span></div>
+          <div class="col"><span class="cn">latitude · longitude</span><span class="ct">decimal 9,6</span></div>
+          <div class="col"><span class="cn">zone_id<span class="k">IDX</span></span><span class="ct">string</span></div>
+          <div class="col"><span class="cn">location_type</span><span class="ct">integer · default 0</span></div>
+          <div class="col"><span class="cn">parent_stop_id<span class="k">FK</span></span><span class="ct">self</span></div>
+          <div class="col"><span class="cn">wheelchair_boarding</span><span class="ct">integer · default 0</span></div>
+        </div>
+        <p class="card-note">Boarding points. A terminal is <code>location_type: :station</code> and its
+          bays point back at it through <code>parent_stop_id</code>.</p>
+      </article>
+
+      <article class="card" style="--stripe: var(--feed);">
+        <div class="card-head"><h3>services</h3><span class="tag">calendar.txt</span></div>
+        <div class="cols">
+          <div class="col"><span class="cn">id<span class="k">PK</span></span><span class="ct">bigint</span></div>
+          <div class="col"><span class="cn">gtfs_id<span class="k">UK</span></span><span class="ct">string · not null</span></div>
+          <div class="col"><span class="cn">monday … sunday</span><span class="ct">boolean ×7</span></div>
+          <div class="col"><span class="cn">start_date · end_date</span><span class="ct">date · not null</span></div>
+        </div>
+        <p class="card-note">A weekly running pattern shared by many trips. Most of the island needs
+          only <code>DAILY</code> and a weekday variant.</p>
+      </article>
+
+      <article class="card" style="--stripe: var(--feed);">
+        <div class="card-head"><h3>service_exceptions</h3><span class="tag">calendar_dates.txt</span></div>
+        <div class="cols">
+          <div class="col"><span class="cn">id<span class="k">PK</span></span><span class="ct">bigint</span></div>
+          <div class="col"><span class="cn">service_id<span class="k">FK</span></span><span class="ct">not null</span></div>
+          <div class="col"><span class="cn">date<span class="k">UK</span></span><span class="ct">date · per service</span></div>
+          <div class="col"><span class="cn">exception_type</span><span class="ct">integer · not null</span></div>
+        </div>
+        <p class="card-note">Fiesta and holiday overrides. <code>Service#runs_on?</code> checks these
+          before the weekly pattern.</p>
+      </article>
+
+      <article class="card" style="--stripe: var(--feed);">
+        <div class="card-head"><h3>frequencies</h3><span class="tag">frequencies.txt</span></div>
+        <div class="cols">
+          <div class="col"><span class="cn">id<span class="k">PK</span></span><span class="ct">bigint</span></div>
+          <div class="col"><span class="cn">trip_id<span class="k">FK</span></span><span class="ct">not null</span></div>
+          <div class="col"><span class="cn">start_time · end_time</span><span class="ct">time · not null</span></div>
+          <div class="col"><span class="cn">headway_secs</span><span class="ct">integer · not null</span></div>
+          <div class="col"><span class="cn">exact_times</span><span class="ct">boolean · false</span></div>
+        </div>
+        <p class="card-note">The table that makes informal transport expressible: a wait, not a
+          timetable. Split into rows when the wait changes between morning and midday.</p>
+      </article>
+
+      <article class="card" style="--stripe: var(--feed);">
+        <div class="card-head"><h3>fares</h3><span class="tag">fare_attributes.txt</span></div>
+        <div class="cols">
+          <div class="col"><span class="cn">id<span class="k">PK</span></span><span class="ct">bigint</span></div>
+          <div class="col"><span class="cn">gtfs_id<span class="k">UK</span></span><span class="ct">string · not null</span></div>
+          <div class="col"><span class="cn">agency_id<span class="k">FK</span></span><span class="ct">integer · null</span></div>
+          <div class="col"><span class="cn">price</span><span class="ct">decimal 8,2</span></div>
+          <div class="col"><span class="cn">currency</span><span class="ct">string · PHP</span></div>
+          <div class="col"><span class="cn">payment_method</span><span class="ct">integer · default 0</span></div>
+          <div class="col"><span class="cn">transfers</span><span class="ct">integer · default 0</span></div>
+          <div class="col"><span class="cn">transfer_duration</span><span class="ct">integer</span></div>
+        </div>
+        <p class="card-note">A negotiated habal fare has no single true price — the common minimum goes
+          here and the range goes in <code>routes.description</code>.</p>
+      </article>
+
+      <article class="card" style="--stripe: var(--feed);">
+        <div class="card-head"><h3>fare_rules</h3><span class="tag">fare_rules.txt</span></div>
+        <div class="cols">
+          <div class="col"><span class="cn">id<span class="k">PK</span></span><span class="ct">bigint</span></div>
+          <div class="col"><span class="cn">fare_id<span class="k">FK</span></span><span class="ct">not null</span></div>
+          <div class="col"><span class="cn">route_id<span class="k">FK</span></span><span class="ct">integer · null</span></div>
+          <div class="col"><span class="cn">origin_zone</span><span class="ct">string</span></div>
+          <div class="col"><span class="cn">destination_zone</span><span class="ct">string</span></div>
+          <div class="col"><span class="cn">contains_zone</span><span class="ct">string</span></div>
+        </div>
+        <p class="card-note">Where a price applies: a whole route, or a zone pair. The zone columns hold
+          <code>stops.zone_id</code> values, not stop ids — GTFS treats them as opaque strings, so they
+          stay strings here.</p>
+      </article>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>App-native tables</h2>
+    <p class="lede">The half GTFS has no opinion about: which modes exist, where a visitor actually wants
+      to go, and who has ridden what.</p>
+    <div class="grid">
+
+      <article class="card" style="--stripe: var(--accent);">
+        <div class="card-head"><h3>vihicles</h3><span class="tag">Mode</span></div>
+        <div class="cols">
+          <div class="col"><span class="cn">id<span class="k">PK</span></span><span class="ct">bigint</span></div>
+          <div class="col"><span class="cn">name</span><span class="ct">string</span></div>
+          <div class="col"><span class="cn">slug<span class="k">UK</span></span><span class="ct">string</span></div>
+          <div class="col"><span class="cn">description</span><span class="ct">text</span></div>
+          <div class="col"><span class="cn">route_type</span><span class="ct">integer · default 3</span></div>
+        </div>
+        <p class="card-note">Tricycle, habal, mini jeep, bus, ferry. GTFS has no code for the first two,
+          so both sit at <code>route_type 3</code> and this association is what tells them apart. The
+          feed carries the same fact in the non-standard <code>routes.mbtt_mode</code> column.</p>
+      </article>
+
+      <article class="card" style="--stripe: var(--accent);">
+        <div class="card-head"><h3>places</h3><span class="tag">Destination</span></div>
+        <div class="cols">
+          <div class="col"><span class="cn">id<span class="k">PK</span></span><span class="ct">bigint</span></div>
+          <div class="col"><span class="cn">name</span><span class="ct">string</span></div>
+          <div class="col"><span class="cn">description</span><span class="ct">text</span></div>
+          <div class="col"><span class="cn">latitude · longitude</span><span class="ct">decimal 9,6</span></div>
+          <div class="col"><span class="cn">image_url</span><span class="ct">string</span></div>
+          <div class="col"><span class="cn">stop_id<span class="k">FK</span></span><span class="ct">integer · null</span></div>
+        </div>
+        <p class="card-note">A beach or a church, not a boarding point. <code>stop_id</code> is the link
+          between "where I want to go" and "where I need to stand".</p>
+      </article>
+
+      <article class="card" style="--stripe: var(--accent);">
+        <div class="card-head"><h3>categories</h3><span class="tag">Grouping</span></div>
+        <div class="cols">
+          <div class="col"><span class="cn">id<span class="k">PK</span></span><span class="ct">bigint</span></div>
+          <div class="col"><span class="cn">name</span><span class="ct">string</span></div>
+          <div class="col"><span class="cn">slug<span class="k">UK</span></span><span class="ct">string</span></div>
+          <div class="col"><span class="cn">description</span><span class="ct">text</span></div>
+        </div>
+        <p class="card-note">Nature, City, Sea. Seeded and matched on <code>slug</code>.</p>
+      </article>
+
+      <article class="card" style="--stripe: var(--accent);">
+        <div class="card-head"><h3>place_categories</h3><span class="tag">Join</span></div>
+        <div class="cols">
+          <div class="col"><span class="cn">id<span class="k">PK</span></span><span class="ct">bigint</span></div>
+          <div class="col"><span class="cn">place_id<span class="k">FK</span></span><span class="ct">not null</span></div>
+          <div class="col"><span class="cn">category_id<span class="k">FK</span></span><span class="ct">not null</span></div>
+        </div>
+        <p class="card-note">Unique per pair. A sandbar is Sea and Nature at once, which a single
+          <code>category_id</code> column could not have said.</p>
+      </article>
+
+      <article class="card" style="--stripe: var(--accent);">
+        <div class="card-head"><h3>users</h3><span class="tag">Respondent</span></div>
+        <div class="cols">
+          <div class="col"><span class="cn">id<span class="k">PK</span></span><span class="ct">bigint</span></div>
+          <div class="col"><span class="cn">name</span><span class="ct">string</span></div>
+          <div class="col"><span class="cn">commuter_type</span><span class="ct">integer · default 0</span></div>
+        </div>
+        <p class="card-note">Enum: <code>0 = local</code>, <code>1 = traveller</code>. It is a column,
+          not a lookup table — the seed file used to create a row per type.</p>
+      </article>
+
+      <article class="card" style="--stripe: var(--rel-app);">
+        <div class="card-head"><h3>histories</h3><span class="tag">Ride record</span></div>
+        <div class="cols">
+          <div class="col"><span class="cn">id<span class="k">PK</span></span><span class="ct">bigint</span></div>
+          <div class="col"><span class="cn">user_id<span class="k">IDX</span></span><span class="ct">integer · no constraint</span></div>
+          <div class="col"><span class="cn">trip_id<span class="k">FK</span></span><span class="ct">integer</span></div>
+        </div>
+        <p class="card-note">A user rode a given trip. <code>History#vihicle</code> reaches the mode
+          through <code>trip → route → vihicle</code>.</p>
+      </article>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>Decisions</h2>
+    <div class="decisions">
+
+      <div class="decision">
+        <span class="status" style="--tone: var(--rel-fk);">Fixed</span>
+        <h3>History belongs to its trip</h3>
+        <p>The foreign key is <code>histories.trip_id</code>, so the old <code>has_one :trip</code> —
+          paired with <code>belongs_to :history</code> on <code>Trip</code>, for a column that never
+          existed — pointed the association the wrong way and would have raised the first time either
+          side was used.</p>
+      </div>
+
+      <div class="decision">
+        <span class="status" style="--tone: var(--accent);">Moved</span>
+        <h3>Times live in stop_times, not on trips</h3>
+        <p>The <code>trips.departure</code> and <code>trips.arrival</code> columns were removed; they
+          only ever duplicated the first and last <code>stop_time</code>.
+          <code>Trip#departure</code>, <code>#arrival</code> and <code>#duration_minutes</code> read
+          the same as before, now computed, and return <code>nil</code> while a trip is half
+          surveyed.</p>
+      </div>
+
+      <div class="decision">
+        <span class="status" style="--tone: var(--accent);">Moved</span>
+        <h3>The mode belongs to the route, not the trip</h3>
+        <p><code>trips.vihicle_id</code> is gone. <code>Trip#vihicle</code> is now
+          <code>has_one :through</code> and <code>Vihicle#trips</code> is
+          <code>has_many through: :routes</code>, so a trip can no longer disagree with its own route
+          about which vehicle runs it.</p>
+      </div>
+
+      <div class="decision">
+        <span class="status" style="--tone: var(--feed);">Modelled</span>
+        <h3>Frequency instead of timetable</h3>
+        <p>Tricycles, habal-habal and most jeeps leave when full. They get one representative trip per
+          route plus <code>frequencies</code> rows with <code>exact_times: false</code>, which is how
+          GTFS expresses headway-based service. Ferry, bus and van get one trip per real departure and
+          no frequency row.</p>
+      </div>
+
+      <div class="decision">
+        <span class="status" style="--tone: var(--rel-app);">Open</span>
+        <h3>histories.user_id still has no database constraint</h3>
+        <p>It is a plain indexed integer while <code>trip_id</code> has a real key. Rails validates
+          <code>belongs_to</code> by default, so ordinary writes are covered — but nothing stops an
+          orphan arriving through a direct SQL write or a bulk import. The asymmetry is inherited from
+          the original migration and left as it was.</p>
+      </div>
+
+      <div class="decision">
+        <span class="status" style="--tone: var(--ink-faint);">Open</span>
+        <h3>No importer, and no shapes</h3>
+        <p>Nothing reads <code>data/gtfs/</code> into these tables yet; <code>gtfs_id</code> is what
+          that importer should upsert on. <code>shapes.txt</code> has no table behind it at all —
+          worth leaving until route geometry is actually collected.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <footer>
+    Generated from <code>backend/db/schema.rb</code> and the association declarations in
+    <code>backend/app/models/</code>. <code>created_at</code> and <code>updated_at</code> are omitted
+    throughout; every table carries them. The same diagram is kept as Mermaid in
+    <code>docs/DATA_MODEL.md</code>, which renders on GitHub, and the feed's own field guide is in
+    <code>data/gtfs/README.md</code>.
+  </footer>
+
+</div>
