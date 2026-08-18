@@ -1,0 +1,23 @@
+daily:
+  gtfs_id: DAILY
+  monday: true
+  tuesday: true
+  wednesday: true
+  thursday: true
+  friday: true
+  saturday: true
+  sunday: true
+  start_date: 2026-09-01
+  end_date: 2027-08-31
+
+weekday:
+  gtfs_id: WD
+  monday: true
+  tuesday: true
+  wednesday: true
+  thursday: true
+  friday: true
+  saturday: false
+  sunday: false
+  start_date: 2026-09-01
+  end_date: 2027-08-31

@@ -1,0 +1,16 @@
+one:
+  gtfs_id: S_MASBATE_MARKET
+  name: Masbate City Public Market
+  description: Jeep loading bay beside the market
+  latitude: 12.370500
+  longitude: 123.622800
+  zone_id: Z_CITY
+  location_type: 0
+
+two:
+  gtfs_id: S_MOBO_POBLACION
+  name: Mobo Poblacion
+  latitude: 12.322000
+  longitude: 123.616000
+  zone_id: Z_MOBO
+  location_type: 0

@@ -1,0 +1,7 @@
+jeep:
+  fare: jeep_masbate_mobo
+  route: one
+
+ferry:
+  fare: ferry_masbate_bulan
+  route: two

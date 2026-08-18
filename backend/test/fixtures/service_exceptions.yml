@@ -1,0 +1,4 @@
+all_souls:
+  service: weekday
+  date: 2026-11-01
+  exception_type: 2

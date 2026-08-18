@@ -1,0 +1,17 @@
+one_origin:
+  trip: one
+  stop: one
+  stop_sequence: 10
+  arrival_time: 2000-01-01 06:00:00
+  departure_time: 2000-01-01 06:00:00
+  timepoint: true
+  shape_dist_traveled: 0.0
+
+one_destination:
+  trip: one
+  stop: two
+  stop_sequence: 20
+  arrival_time: 2000-01-01 06:25:00
+  departure_time: 2000-01-01 06:25:00
+  timepoint: false
+  shape_dist_traveled: 9.4

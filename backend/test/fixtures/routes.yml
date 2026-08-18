@@ -1,0 +1,14 @@
+one:
+  gtfs_id: R_JEEP_MASBATE_MOBO
+  agency: one
+  vihicle: one
+  long_name: Masbate City – Mobo
+  description: Loads at the public market until full.
+  route_type: 3
+
+two:
+  gtfs_id: R_FERRY_MASBATE_BULAN
+  agency: two
+  vihicle: two
+  long_name: Masbate – Bulan
+  route_type: 4

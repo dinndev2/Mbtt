@@ -1,0 +1,15 @@
+jeep_masbate_mobo:
+  gtfs_id: F_JEEP_MASBATE_MOBO
+  agency: one
+  price: 25.00
+  currency: PHP
+  payment_method: 0
+  transfers: 0
+
+ferry_masbate_bulan:
+  gtfs_id: F_FERRY_MASBATE_BULAN
+  agency: two
+  price: 220.00
+  currency: PHP
+  payment_method: 1
+  transfers: 0

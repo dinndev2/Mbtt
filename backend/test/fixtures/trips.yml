@@ -1,0 +1,13 @@
+one:
+  gtfs_id: R_JEEP_MASBATE_MOBO_DAILY_01
+  route: one
+  service: daily
+  headsign: Mobo
+  direction: 0
+
+two:
+  gtfs_id: R_FERRY_MASBATE_BULAN_DAILY_01
+  route: two
+  service: daily
+  headsign: Bulan
+  direction: 0

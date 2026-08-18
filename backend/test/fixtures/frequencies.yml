@@ -1,0 +1,13 @@
+morning:
+  trip: one
+  start_time: 2000-01-01 05:00:00
+  end_time: 2000-01-01 08:00:00
+  headway_secs: 900
+  exact_times: false
+
+midday:
+  trip: one
+  start_time: 2000-01-01 08:00:00
+  end_time: 2000-01-01 18:00:00
+  headway_secs: 1800
+  exact_times: false

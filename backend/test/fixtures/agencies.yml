@@ -1,0 +1,13 @@
+one:
+  gtfs_id: AG_MBTT
+  name: Masbate City Tricycle Operators
+  url: https://example.org/mbtt
+  timezone: Asia/Manila
+  lang: en
+
+two:
+  gtfs_id: AG_FERRY
+  name: Masbate Ferry Lines
+  url: https://example.org/ferry
+  timezone: Asia/Manila
+  lang: en

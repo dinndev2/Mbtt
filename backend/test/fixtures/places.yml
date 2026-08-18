@@ -1,0 +1,12 @@
+one:
+  name: Buntod Reef Marine Sanctuary
+  description: Sandbar and reef off Masbate City.
+  latitude: 12.353000
+  longitude: 123.639000
+  stop: one
+
+two:
+  name: Mobo Poblacion Church
+  latitude: 12.322500
+  longitude: 123.615500
+  stop: two
