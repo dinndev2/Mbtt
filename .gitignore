@@ -1,0 +1,43 @@
+# Repo-wide ignores. The backend and frontend each keep their own .gitignore
+# for stack-specific build output; this file covers what applies everywhere.
+
+# Dependencies -- matches at any depth, so backend/ and frontend/ are both covered.
+node_modules/
+
+# Environment files and secrets. Commit a .env.example instead.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+.fuse_hidden*
+
+# Editors
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.swp
+*.swo
+*.sublime-workspace
+
+# Stray shell config that landed in the project root.
+.bashrc
+
+# Scratch space
+/tmp/
+*.log

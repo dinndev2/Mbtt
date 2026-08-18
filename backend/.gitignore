@@ -30,3 +30,7 @@
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key
+
+# Ignore npm dependencies. Rails 8 ships no node_modules rule of its own, but
+# this app has a package.json for Tailwind.
+/node_modules
