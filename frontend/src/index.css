@@ -1,0 +1,107 @@
+@import "tailwindcss";
+
+/* Self-hosted so the app still renders correctly with no network. Both faces
+   are SIL OFL, which permits redistribution. Latin subset only. */
+@font-face {
+  font-family: "Rozha One";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/rozha-one-400.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Jost";
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url("/fonts/jost-300.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Jost";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/jost-400.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Jost";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/jost-500.woff2") format("woff2");
+}
+
+@theme {
+  /* ---- Surfaces -------------------------------------------------------
+     Three stacked planes: the workspace sits behind the app frame, the
+     screen is the app itself, and cards float on top of the screen. */
+  --color-workspace: #e6e2d9;
+  --color-screen: #f7f4ee;
+  --color-surface: #ffffff;
+
+  /* ---- Brand ---------------------------------------------------------- */
+  --color-venice: #16587b;
+  --color-venice-light: #5f92b5;
+  --color-venice-pale: #eef3f6;
+  --color-venice-muted: #cfdde5;
+
+  /* ---- Text ----------------------------------------------------------- */
+  --color-ink: #2e3a43;
+  /* Secondary text is the same ink at 73%, not a separate grey - it keeps
+     text sitting on cream and on white looking like one family. */
+  --color-ink-soft: color-mix(in srgb, #2e3a43 73%, transparent);
+
+  /* ---- Fills and lines ------------------------------------------------ */
+  --color-chip: #f4f1ea;
+  --color-divider: #e0dbd0;
+  --color-well: #e6e2d9;
+
+  /* ---- Type ----------------------------------------------------------- */
+  --font-display: "Rozha One", Georgia, "Times New Roman", serif;
+  --font-sans: "Jost", ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  /* ---- Radii ----------------------------------------------------------
+     Soft throughout. Rows and inputs 16-20, cards 22-30, chips fully round. */
+  --radius-input: 16px;
+  --radius-row: 20px;
+  --radius-panel: 22px;
+  --radius-card: 26px;
+  --radius-card-lg: 30px;
+  --radius-pill: 999px;
+}
+
+@layer base {
+  html {
+    /* The plane behind the app frame. Visible either side of a centred
+       layout on wide screens. */
+    background-color: var(--color-workspace);
+    /* iOS Safari otherwise inflates body text when a phone is turned to
+       landscape, which breaks every line length we set. */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-screen);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    /* A long place or municipality name should wrap rather than push the
+       page sideways on a 320px screen. */
+    overflow-wrap: break-word;
+  }
+
+  /* Rozha One is a display face - it has one weight and reads as too tight
+     at default line-height. */
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    line-height: 1.15;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-venice);
+    outline-offset: 2px;
+  }
+}
