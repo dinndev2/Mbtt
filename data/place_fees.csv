@@ -1,0 +1,16 @@
+fee_id,place_id,label,amount_min_php,amount_max_php,basis,covers_pax,required,confidence,valid_as_of,source_url,notes
+FEE_BUNTOD_ENTRY,P_BUNTOD,Entrance,50,50,per_person,1,1,reported,2026-01-01,https://outoftownblog.com/buntod-reef-marine-sanctuary-and-sandbar/,Children 20.
+FEE_BUNTOD_ENV,P_BUNTOD,Environmental fee,20,20,per_person,1,1,reported,2026-01-01,https://outoftownblog.com/buntod-reef-marine-sanctuary-and-sandbar/,
+FEE_BUNTOD_DOCK,P_BUNTOD,Boat docking,100,100,per_boat,14,1,reported,2026-01-01,https://outoftownblog.com/buntod-reef-marine-sanctuary-and-sandbar/,Charged once per boat.
+FEE_BUNTOD_GUIDE,P_BUNTOD,Reef guide,100,100,per_person,1,0,stale,2018-04-01,https://www.traveling-up.com/buntod-reef-marine-sanctuary-sandbar-masbate-city/,Per hour. Optional.
+FEE_BUNTOD_SNORKEL,P_BUNTOD,Snorkel gear,100,100,per_person,1,0,stale,2018-04-01,https://www.traveling-up.com/buntod-reef-marine-sanctuary-sandbar-masbate-city/,Optional.
+FEE_ANIMASOLA_ENTRY,P_ANIMASOLA,Entrance,50,50,per_person,1,1,reported,2026-05-01,https://lakbaypinas.com/burias-island-guide-diy-budget-itinerary-ferry/,
+FEE_ANIMASOLA_DOCK,P_ANIMASOLA,Boat docking,100,100,per_boat,6,1,reported,2026-05-01,https://lakbaypinas.com/burias-island-guide-diy-budget-itinerary-ferry/,
+FEE_TINALISAYAN_ENTRY,P_TINALISAYAN,Entrance,50,100,per_person,1,1,reported,2026-05-01,https://lakbaypinas.com/burias-island-guide-diy-budget-itinerary-ferry/,
+FEE_TINALISAYAN_DOCK,P_TINALISAYAN,Boat docking,300,300,per_boat,6,1,reported,2026-05-01,https://lakbaypinas.com/burias-island-guide-diy-budget-itinerary-ferry/,
+FEE_SOMBRERO_ENTRY,P_SOMBRERO,Entrance,50,100,per_person,1,1,reported,2026-05-01,https://lakbaypinas.com/burias-island-guide-diy-budget-itinerary-ferry/,Older sources quote 20 - it has gone up.
+FEE_SOMBRERO_TENT,P_SOMBRERO,Tent pitching,150,200,per_person,1,0,reported,2026-05-01,https://lakbaypinas.com/burias-island-guide-diy-budget-itinerary-ferry/,Overnight camping only.
+FEE_BURIAS_ENV,P_SOMBRERO,LGU environmental fee,50,100,per_person,1,1,reported,2026-05-01,https://lakbaypinas.com/burias-island-guide-diy-budget-itinerary-ferry/,Collected once for the whole Burias trip - do not double count across islands.
+FEE_BURIAS_TERMINAL,P_SOMBRERO,Terminal fee,30,50,per_person,1,1,reported,2026-05-01,https://lakbaypinas.com/burias-island-guide-diy-budget-itinerary-ferry/,Collected once at the port.
+FEE_BATONGAN_ENTRY,P_BATONGAN_CAVE,Entrance,20,20,per_person,1,1,reported,2026-01-01,https://bicoltravelguides.com/,
+FEE_PAWA_ENTRY,P_PAWA,Entrance,0,0,per_person,1,1,reported,2026-01-01,https://www.tripadvisor.com.ph/Attraction_Review-g667127-d9605622-Reviews-Pawa_Mangrove_Park-Masbate_City_Masbate_Island_Masbate_Province_Bicol_Region_Luzo.html,Free. No coordination needed before visiting.

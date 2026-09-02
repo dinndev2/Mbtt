@@ -191,6 +191,10 @@
   .m-fk   { fill: var(--rel-fk); }
   .m-app  { fill: var(--rel-app); }
 
+  .e-q     { fill: none; stroke: var(--ink-faint); stroke-width: 2; stroke-dasharray: 2 5; }
+  .l-q     { fill: var(--ink-faint); }
+  .m-q     { fill: var(--ink-faint); }
+
   /* ---------- key ---------- */
 
   .key {
@@ -211,6 +215,7 @@
   .swatch { width: 26px; height: 0; border-top-width: 2px; flex: none; }
   .sw-fk   { border-top-style: solid;  border-top-color: var(--rel-fk); }
   .sw-app  { border-top-style: dashed; border-top-color: var(--rel-app); }
+  .sw-q    { border-top-style: dotted; border-top-color: var(--ink-faint); }
   .sw-feed {
     width: 4px; height: 15px;
     background: var(--feed);
@@ -403,17 +408,17 @@
   <header class="masthead">
     <div class="eyebrow">Mbtt · backend · Rails 8</div>
     <h1>Schema Map</h1>
-    <p class="dek">Sixteen tables along one spine. Ten of them mirror a GTFS file column for column, so
-      the hand-collected feed in <code>data/gtfs/</code> loads without translation; the other six are
-      the island's own — modes, destinations, and who rode what. Read from
-      <code>db/schema.rb</code> at version 2026_08_17_091000.</p>
+    <p class="dek">Seventeen tables along one spine. Ten of them mirror a GTFS file column for column,
+      so the hand-collected feed in <code>data/gtfs/</code> loads without translation; the other seven
+      are the island's own — modes, destinations, the joins between them, and who rode what. Read from
+      <code>db/schema.rb</code> at version 2026_08_19_100000.</p>
 
     <dl class="facts">
-      <div class="fact"><dt>Tables</dt><dd>16</dd></div>
-      <div class="fact"><dt>DB foreign keys</dt><dd>16</dd></div>
+      <div class="fact"><dt>Tables</dt><dd>17</dd></div>
+      <div class="fact"><dt>DB foreign keys</dt><dd>19</dd></div>
       <div class="fact"><dt>GTFS-mirrored</dt><dd>10</dd></div>
       <div class="fact"><dt>App-level only</dt><dd>1</dd></div>
-      <div class="fact"><dt>Migrations</dt><dd>18</dd></div>
+      <div class="fact"><dt>Migrations</dt><dd>20</dd></div>
     </dl>
   </header>
 
@@ -423,9 +428,12 @@
            aria-label="Entity relationship map. A left-to-right spine runs agencies, routes, trips,
                        stop_times, stops. Vihicles feeds routes from above and services feeds trips,
                        with service_exceptions hanging off services. Frequencies, fares and fare_rules
-                       sit below the spine, places and categories below stops, and users and histories
-                       at the lower left. Every relation is a database foreign key except users to
-                       histories, which is declared in the models only.">
+                       sit below the spine; a four-table destination block — places, place_vihicles,
+                       place_categories, categories — sits under stops; users and histories are at the
+                       lower left. Vihicles also reaches place_vihicles by a long edge over the top.
+                       Every relation is a database foreign key except users to histories, which is
+                       declared in the models only, and fares to stops, a dotted edge proposed for
+                       removal that loops around the bottom of the diagram.">
         <defs>
           <marker id="ar-fk" viewBox="0 0 10 10" refX="9" refY="5"
                   markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -434,6 +442,10 @@
           <marker id="ar-app" viewBox="0 0 10 10" refX="9" refY="5"
                   markerWidth="7" markerHeight="7" orient="auto-start-reverse">
             <polygon class="m-app" points="0,1 10,5 0,9" />
+          </marker>
+          <marker id="ar-q" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <polygon class="m-q" points="0,1 10,5 0,9" />
           </marker>
         </defs>
 
@@ -476,12 +488,22 @@
         <path class="e-fk" d="M955,350 V278" marker-end="url(#ar-fk)" />
         <text class="e-label l-fk" x="963" y="318">stop_id</text>
 
-        <!-- edges: places and categories -->
+        <!-- edges: the destination block -->
         <path class="e-fk" d="M820,504 H880" marker-end="url(#ar-fk)" />
         <text class="e-label l-fk" x="850" y="496" text-anchor="middle">category_id</text>
 
-        <path class="e-fk" d="M745,470 V384 H880" marker-end="url(#ar-fk)" />
-        <text class="e-label l-fk" x="753" y="434">place_id</text>
+        <path class="e-fk" d="M745,470 V444 H920 V418" marker-end="url(#ar-fk)" />
+        <text class="e-label l-fk" x="753" y="462">place_id</text>
+
+        <path class="e-fk" d="M820,384 H880" marker-end="url(#ar-fk)" />
+        <text class="e-label l-fk" x="850" y="376" text-anchor="middle">place_id</text>
+
+        <path class="e-fk" d="M325,80 V58 H640 V384 H670" marker-end="url(#ar-fk)" />
+        <text class="e-label l-fk" x="648" y="312">vihicle_id</text>
+
+        <!-- edge: present in the schema, proposed for removal -->
+        <path class="e-q" d="M190,384 H210 V560 H1078 V300 H990 V278" marker-end="url(#ar-q)" />
+        <text class="e-label l-q" x="644" y="552" text-anchor="middle">stop_id — proposed for removal</text>
 
         <!-- edges: people -->
         <path class="e-fk" d="M400,504 H430 V320 H500 V278" marker-end="url(#ar-fk)" />
@@ -564,8 +586,13 @@
 
         <rect class="n-rect" x="880" y="350" width="150" height="68" rx="4" />
         <text class="n-name" x="896" y="376">places</text>
-        <text class="n-col"  x="896" y="394">lat · lon</text>
-        <text class="n-col"  x="896" y="409">image_url</text>
+        <text class="n-col"  x="896" y="394">external_id · uk</text>
+        <text class="n-col"  x="896" y="409">entrance_fee_php</text>
+
+        <rect class="n-rect" x="670" y="350" width="150" height="68" rx="4" />
+        <text class="n-name" x="686" y="376">place_vihicles</text>
+        <text class="n-col"  x="686" y="394">place_id</text>
+        <text class="n-col"  x="686" y="409">vihicle_id</text>
 
         <!-- nodes: lower band -->
         <rect class="n-rect" x="40" y="470" width="150" height="68" rx="4" />
@@ -591,14 +618,17 @@
     <div class="key">
       <div class="key-item"><span class="swatch sw-fk"></span> Foreign key enforced by the database</div>
       <div class="key-item"><span class="swatch sw-app"></span> Association declared in the model only</div>
+      <div class="key-item"><span class="swatch sw-q"></span> In the schema, proposed for removal</div>
       <div class="key-item"><span class="sw-feed"></span> Mirrors a GTFS file</div>
       <div class="key-item"><span class="sw-hub"></span> Hub</div>
     </div>
 
     <figcaption>The spine reads left to right the way a journey is described: an operator runs a route,
       the route has runs, a run calls at stops in order. <code>trips</code> is the hub — six tables
-      reach it, and it is the only place a schedule, a headway and a rider's history all meet.
-      Everything here is a real database constraint except <code>users → histories</code>.</figcaption>
+      reach it, and it is the only place a schedule, a headway and a rider's history all meet. The
+      bottom-right quadrant is the destination block, joined to the spine at one point only:
+      <code>places.stop_id</code>. The dotted line around the outside is <code>fares.stop_id</code>,
+      which is a real constraint but should not be — its length is the argument.</figcaption>
   </figure>
 
   <section>
@@ -738,9 +768,11 @@
           <div class="col"><span class="cn">payment_method</span><span class="ct">integer · default 0</span></div>
           <div class="col"><span class="cn">transfers</span><span class="ct">integer · default 0</span></div>
           <div class="col"><span class="cn">transfer_duration</span><span class="ct">integer</span></div>
+          <div class="col"><span class="cn">stop_id<span class="k">FK</span></span><span class="ct">integer · null · not GTFS</span></div>
         </div>
         <p class="card-note">A negotiated habal fare has no single true price — the common minimum goes
-          here and the range goes in <code>routes.description</code>.</p>
+          here and the range goes in <code>routes.description</code>. <code>stop_id</code> is a local
+          addition with no column behind it in <code>fare_attributes.txt</code>; see Decisions.</p>
       </article>
 
       <article class="card" style="--stripe: var(--feed);">
@@ -790,9 +822,30 @@
           <div class="col"><span class="cn">latitude · longitude</span><span class="ct">decimal 9,6</span></div>
           <div class="col"><span class="cn">image_url</span><span class="ct">string</span></div>
           <div class="col"><span class="cn">stop_id<span class="k">FK</span></span><span class="ct">integer · null</span></div>
+          <div class="col"><span class="cn">external_id<span class="k">UK</span></span><span class="ct">string · places.csv place_id</span></div>
+          <div class="col"><span class="cn">municipality · island</span><span class="ct">string · indexed</span></div>
+          <div class="col"><span class="cn">coord_status</span><span class="ct">string · verified | web_sourced | needs_survey</span></div>
+          <div class="col"><span class="cn">source</span><span class="ct">string</span></div>
+          <div class="col"><span class="cn">entrance_fee_php</span><span class="ct">decimal 8,2</span></div>
+          <div class="col"><span class="cn">fare_note · travel_time_note</span><span class="ct">string · free text</span></div>
+          <div class="col"><span class="cn">access_note</span><span class="ct">text · the legs, in order</span></div>
         </div>
         <p class="card-note">A beach or a church, not a boarding point. <code>stop_id</code> is the link
-          between "where I want to go" and "where I need to stand".</p>
+          between "where I want to go" and "where I need to stand". <code>entrance_fee_php</code> is a
+          decimal because a gate fee is one number the place itself charges; <code>fare_note</code> is a
+          string because the cost of <em>getting</em> there is not.</p>
+      </article>
+
+      <article class="card" style="--stripe: var(--accent);">
+        <div class="card-head"><h3>place_vihicles</h3><span class="tag">Join</span></div>
+        <div class="cols">
+          <div class="col"><span class="cn">id<span class="k">PK</span></span><span class="ct">bigint</span></div>
+          <div class="col"><span class="cn">place_id<span class="k">FK</span></span><span class="ct">not null</span></div>
+          <div class="col"><span class="cn">vihicle_id<span class="k">FK</span></span><span class="ct">not null</span></div>
+        </div>
+        <p class="card-note">Which modes can actually reach a destination, unique per pair — the mode
+          chooser reads it without walking the schedule. It is a claim about access, not about price:
+          Halea needs a ferry, a habal and a hired boat, and only one of those three has a fare row.</p>
       </article>
 
       <article class="card" style="--stripe: var(--accent);">
@@ -884,6 +937,41 @@
       </div>
 
       <div class="decision">
+        <span class="status" style="--tone: var(--feed);">Modelled</span>
+        <h3>A fare belongs to the journey, not to the destination</h3>
+        <p>"What does Halea cost?" has no answer without an origin — around ₱543 from Masbate City,
+          much less from Monreal. A <code>place_fares</code> join would have to either pick one origin
+          and stay silent about it, or carry a row per origin — which is what <code>routes</code> plus
+          <code>fare_rules</code> already are. The link a place needs already exists:
+          <code>place → stop → stop_times → trips → routes → fare_rules → fares</code>. What is missing
+          is <code>Stop has_many :routes, through: :trips</code> and a <code>Place#fares</code> on top
+          of it. Two association lines, no migration, and a place served by three routes gets three
+          fares for free.</p>
+      </div>
+
+      <div class="decision">
+        <span class="status" style="--tone: var(--rel-app);">Questioned</span>
+        <h3>fares.stop_id says a stop has exactly one price</h3>
+        <p><code>Stop has_one :fare</code> is wrong on the day Masbate Port gets its second mode, and it
+          already has three. The column is not in <code>fare_attributes.txt</code>, so an importer has
+          nothing to fill it from; and it scopes a price a second way, alongside
+          <code>fare_rules</code>, so the two can disagree with no rule for which wins. Proposed: drop
+          the column and the association, and let <code>fare_rules</code> be the only place a price is
+          scoped.</p>
+      </div>
+
+      <div class="decision">
+        <span class="status" style="--tone: var(--ink-faint);">Open</span>
+        <h3>fare_note is a string on purpose</h3>
+        <p>The researched transport figures in <code>data/places.csv</code> are
+          <code>543-743</code> and <code>243 + habal + boat hire</code> — a range and a composition, not
+          prices. Rounding them into a decimal would invent precision nobody collected, so they stay as
+          written and the search list shows them verbatim. Once <code>trips</code> and
+          <code>stop_times</code> have rows the derived chain takes over and this column becomes a
+          fallback with provenance, not the answer.</p>
+      </div>
+
+      <div class="decision">
         <span class="status" style="--tone: var(--rel-app);">Open</span>
         <h3>histories.user_id still has no database constraint</h3>
         <p>It is a plain indexed integer while <code>trip_id</code> has a real key. Rails validates
@@ -907,8 +995,9 @@
     Generated from <code>backend/db/schema.rb</code> and the association declarations in
     <code>backend/app/models/</code>. <code>created_at</code> and <code>updated_at</code> are omitted
     throughout; every table carries them. The same diagram is kept as Mermaid in
-    <code>docs/DATA_MODEL.md</code>, which renders on GitHub, and the feed's own field guide is in
-    <code>data/gtfs/README.md</code>.
+    <code>docs/DATA_MODEL.md</code>, which renders on GitHub but is still written against
+    <code>2026_08_17_091000</code> and does not yet show <code>place_vihicles</code> or the new
+    <code>places</code> columns. The feed's own field guide is in <code>data/gtfs/README.md</code>.
   </footer>
 
 </div>

@@ -1,1 +1,2 @@
 feed_publisher_name,feed_publisher_url,feed_lang,feed_start_date,feed_end_date,feed_version,feed_contact_email
+MBTT,https://example.org/mbtt,en,20260820,20270819,2026-08-20,din@developerz.ai

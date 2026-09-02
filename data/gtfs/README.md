@@ -73,6 +73,7 @@ usually a terminal, a waiting shed, or a known landmark corner.
 | `location_type` | no | Empty or `0` = stop. `1` = station (a terminal containing several boarding bays). |
 | `parent_station` | no | The `stop_id` of the enclosing station, when `location_type` is empty/`0`. |
 | `wheelchair_boarding` | no | `0` unknown, `1` possible, `2` not possible. |
+| `mbtt_coord_precision` | project extension | `exact`, `town_centroid` or `estimated` — how much to trust the pin. |
 
 ```csv
 S_MASBATE_PORT,,Masbate Port,Ferry terminal beside the wharf,12.37340,123.62630,Z_CITY,0,,0
@@ -92,10 +93,47 @@ One row per route, not per vehicle and not per departure.
 | `route_type` | yes | See the mode table below. |
 | `route_color` / `route_text_color` | no | 6-digit hex, **no** `#` (`0F7B4A`). |
 | `mbtt_mode` | project extension | Plain mode word, matches a `vihicles.name` row. |
+| `mbtt_leg_id` | project extension | The `leg_id` in `../fare_legs.csv` this route is priced by. |
+| `mbtt_schedule_confidence` | project extension | How far to trust the timetable. Same five values as a fare's `confidence`. |
+| `mbtt_schedule_as_of` | project extension | Date the timetable was last checked against a source. |
+| `mbtt_schedule_source` | project extension | Where the timetable came from. Empty means nowhere — it was invented. |
+| `mbtt_schedule_note` | project extension | What is wrong with it, in words. |
 
 `mbtt_mode` is not part of the GTFS spec — it's an extra column so the app can
 show the right vehicle icon and fare logic. Validators will flag it as unknown;
 that's expected and harmless.
+
+#### Schedule confidence
+
+A fare in this dataset already says how much to trust it. A departure time did
+not, and that was the bigger lie: GTFS renders `10:00:00` identically whether it
+came from the operator or from someone's guess about how often a habal-habal
+turns up. `mbtt_schedule_confidence` closes that gap using the same vocabulary
+as `fare_legs.csv`, so one rule covers both.
+
+| Value | Means | Count |
+| --- | --- | --- |
+| `published` | From the operator | 0 |
+| `reported` | Recent listing or travel writing, corroborated | 3 |
+| `estimate` | Operating window is plausible, the headway is invented | 14 |
+| `stale` | Real once, and a newer source now contradicts the feed | 3 |
+| `unknown` | Nothing published, or nothing in the feed to schedule | 2 |
+
+Nothing in this feed is `published`. Every ferry time here comes from a booking
+aggregator or a blog, not from Montenegro, Barrun or Kho.
+
+Three things the confidence pass turned up that are worth fixing before they
+reach a screen:
+
+- **`R_RORO_MSB_PILAR` has no Masbate → Pilar direction.** Five trips, all
+  inbound. The feed cannot route anyone *off* the island on the main gateway
+  route. The May 2026 listing has Masbate departing 08:00, 10:00, 12:00 and
+  16:00; the five inbound times in the feed match no published source either.
+- **`R_FC_MSB_PILAR` has no trips at all.** Route row and fare leg exist,
+  nothing schedulable against them.
+- **`R_PUMP_MSB_LAGUNDI` runs three hours too late.** The feed keeps pumpboats
+  going to 16:00; the only published account puts the last one off the Fish Port
+  at about 13:00. This is the failure mode that strands someone.
 
 **Mode → `route_type`**
 
@@ -285,8 +323,8 @@ zip -j -r mbtt-gtfs.zip data/gtfs/*.txt
 java -jar gtfs-validator.jar -i mbtt-gtfs.zip -o /tmp/gtfs-report
 ```
 
-Expect one `unknown_column` notice for `routes.mbtt_mode`. Anything at ERROR
-level needs fixing.
+Expect `unknown_column` notices for `routes.mbtt_mode`, `routes.mbtt_leg_id`
+and `stops.mbtt_coord_precision`. Anything at ERROR level needs fixing.
 
 ## Importing
 
@@ -296,6 +334,46 @@ The backend schema now mirrors these files one table per file — `agencies`,
 a unique `gtfs_id` column. `routes.mbtt_mode` maps to a `vihicles` row via its
 `slug`. See [DATA_MODEL.md](../../docs/DATA_MODEL.md).
 
-The importer itself is **not written yet**. When it is, `gtfs_id` is what it
-should upsert on, so a re-import updates rows instead of duplicating them.
-`shapes.txt` has no table behind it — collect the other files first.
+`db/seeds.rb` imports `stops.txt` (upserting on `gtfs_id`) along with the
+research CSVs in the parent directory. The remaining files — routes, trips,
+stop_times, frequencies, fares — still have no importer; their tables exist and
+are exercised by the worked example in the seeds. `shapes.txt` has no table
+behind it.
+
+## Provenance and confidence
+
+Everything in these files is desk research collected 20 August 2026 — ferry
+operator listings, LGU rates, travel blogs, Wikipedia — not survey. Treat it as
+a starting point to verify. The feed is internally consistent (every id
+resolves, every trip has ordered stop_times) but "consistent" is not "true".
+
+What that means per file:
+
+- **`stops.txt`** — 32 stops, all with coordinates. The project extension
+  `mbtt_coord_precision` says how good each one is: `town_centroid` (the
+  municipality centre, from OpenStreetMap — right town, wrong pin) or
+  `estimated` (a jump-off or landing inferred from its nearest town). None are
+  surveyed. They are good enough to draw a map and not good enough to navigate.
+- **`routes.txt`** — 22 routes. Endpoints are reliable. `mbtt_leg_id` links
+  each route to its row in `../fare_legs.csv`.
+- **`trips.txt` / `stop_times.txt`** — 45 trips. The Masbate–Lagundi,
+  Bulan–San Jacinto, Pasacao–San Pascual and Pilar–Masbate crossings have real
+  published departure times. Load-and-go modes get one representative trip each,
+  described by `frequencies.txt`.
+- **`frequencies.txt`** — 16 rows. Operating windows are plausible; **the
+  headways are guesses** and should be the first thing a surveyor replaces.
+  `exact_times` is `0` throughout, which is honest — nothing here leaves on a
+  fixed clock.
+- **`fare_attributes.txt` / `fare_rules.txt`** — 19 fares, generated from the
+  per-rider subset of `../fare_legs.csv`. The other 14 legs — boat charter,
+  negotiated habal-habal, distance bands, and legs with no published price —
+  have no GTFS representation at all. See [../README.md](../README.md).
+- **`calendar.txt`** — one `DAILY` service. No route here is known to vary by
+  day of week, which is an absence of evidence rather than evidence of absence.
+- **`shapes.txt`, `calendar_dates.txt`** — still empty.
+
+`../places.csv` holds the tourist destinations, with `../place_access.csv`,
+`../fare_legs.csv` and `../place_fees.csv` describing how to reach each one and
+what it costs. Those are not GTFS files — GTFS has no concept of a destination —
+and they feed the app's own tables. See [../README.md](../README.md) for the
+fare model and for what to verify first.

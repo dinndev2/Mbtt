@@ -10,7 +10,27 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_08_17_091001) do
+ActiveRecord::Schema[8.0].define(version: 2026_08_25_090000) do
+  create_table "advisories", force: :cascade do |t|
+    t.string "external_id", null: false
+    t.string "scope", null: false
+    t.string "scope_ref"
+    t.string "kind", null: false
+    t.string "severity", default: "info", null: false
+    t.string "headline", null: false
+    t.text "detail"
+    t.string "season_from"
+    t.string "season_to"
+    t.string "confidence", default: "unknown", null: false
+    t.date "valid_as_of"
+    t.string "source_url"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["external_id"], name: "index_advisories_on_external_id", unique: true
+    t.index ["scope", "scope_ref"], name: "index_advisories_on_scope_and_scope_ref"
+    t.index ["severity"], name: "index_advisories_on_severity"
+  end
+
   create_table "agencies", force: :cascade do |t|
     t.string "gtfs_id", null: false
     t.string "name", null: false
@@ -31,6 +51,29 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_17_091001) do
     t.string "slug"
     t.text "description"
     t.index ["slug"], name: "index_categories_on_slug", unique: true
+  end
+
+  create_table "fare_legs", force: :cascade do |t|
+    t.string "external_id", null: false
+    t.integer "from_stop_id"
+    t.integer "to_stop_id"
+    t.integer "vihicle_id"
+    t.decimal "amount_min_php", precision: 10, scale: 2
+    t.decimal "amount_max_php", precision: 10, scale: 2
+    t.string "basis", null: false
+    t.integer "covers_pax", default: 1, null: false
+    t.string "fare_kind", null: false
+    t.integer "duration_min"
+    t.string "confidence", default: "unknown", null: false
+    t.date "valid_as_of"
+    t.string "source_url"
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["external_id"], name: "index_fare_legs_on_external_id", unique: true
+    t.index ["from_stop_id"], name: "index_fare_legs_on_from_stop_id"
+    t.index ["to_stop_id"], name: "index_fare_legs_on_to_stop_id"
+    t.index ["vihicle_id"], name: "index_fare_legs_on_vihicle_id"
   end
 
   create_table "fare_rules", force: :cascade do |t|
@@ -81,6 +124,26 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_17_091001) do
     t.index ["user_id"], name: "index_histories_on_user_id"
   end
 
+  create_table "islands", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "place_access_legs", force: :cascade do |t|
+    t.integer "place_id", null: false
+    t.integer "fare_leg_id", null: false
+    t.string "option", default: "A", null: false
+    t.integer "seq", null: false
+    t.string "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["fare_leg_id"], name: "index_place_access_legs_on_fare_leg_id"
+    t.index ["place_id", "option", "seq"], name: "index_place_access_legs_on_place_id_and_option_and_seq", unique: true
+    t.index ["place_id"], name: "index_place_access_legs_on_place_id"
+  end
+
   create_table "place_categories", force: :cascade do |t|
     t.integer "place_id", null: false
     t.integer "category_id", null: false
@@ -89,6 +152,49 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_17_091001) do
     t.index ["category_id"], name: "index_place_categories_on_category_id"
     t.index ["place_id", "category_id"], name: "index_place_categories_on_place_id_and_category_id", unique: true
     t.index ["place_id"], name: "index_place_categories_on_place_id"
+  end
+
+  create_table "place_fees", force: :cascade do |t|
+    t.string "external_id", null: false
+    t.integer "place_id", null: false
+    t.string "label", null: false
+    t.decimal "amount_min_php", precision: 10, scale: 2
+    t.decimal "amount_max_php", precision: 10, scale: 2
+    t.string "basis", null: false
+    t.integer "covers_pax", default: 1, null: false
+    t.boolean "required", default: true, null: false
+    t.string "confidence", default: "unknown", null: false
+    t.date "valid_as_of"
+    t.string "source_url"
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["external_id"], name: "index_place_fees_on_external_id", unique: true
+    t.index ["place_id"], name: "index_place_fees_on_place_id"
+  end
+
+  create_table "place_images", force: :cascade do |t|
+    t.integer "place_id", null: false
+    t.integer "seq", null: false
+    t.string "local_path", null: false
+    t.string "license", null: false
+    t.string "attribution"
+    t.string "source_page"
+    t.integer "bytes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["place_id", "seq"], name: "index_place_images_on_place_id_and_seq", unique: true
+    t.index ["place_id"], name: "index_place_images_on_place_id"
+  end
+
+  create_table "place_vihicles", force: :cascade do |t|
+    t.integer "place_id", null: false
+    t.integer "vihicle_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["place_id", "vihicle_id"], name: "index_place_vihicles_on_place_id_and_vihicle_id", unique: true
+    t.index ["place_id"], name: "index_place_vihicles_on_place_id"
+    t.index ["vihicle_id"], name: "index_place_vihicles_on_vihicle_id"
   end
 
   create_table "places", force: :cascade do |t|
@@ -100,6 +206,24 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_17_091001) do
     t.decimal "longitude", precision: 9, scale: 6
     t.string "image_url"
     t.integer "stop_id"
+    t.string "external_id"
+    t.string "municipality"
+    t.string "island"
+    t.string "coord_status"
+    t.string "source"
+    t.decimal "entrance_fee_php", precision: 8, scale: 2
+    t.string "fare_note"
+    t.string "travel_time_note"
+    t.text "access_note"
+    t.integer "prominence_rank"
+    t.string "prominence_tier"
+    t.integer "source_count"
+    t.string "prominence_basis"
+    t.date "prominence_as_of"
+    t.index ["external_id"], name: "index_places_on_external_id", unique: true
+    t.index ["island"], name: "index_places_on_island"
+    t.index ["municipality"], name: "index_places_on_municipality"
+    t.index ["prominence_rank"], name: "index_places_on_prominence_rank"
     t.index ["stop_id"], name: "index_places_on_stop_id"
   end
 
@@ -115,7 +239,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_17_091001) do
     t.string "text_color"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "schedule_confidence", default: "unknown", null: false
+    t.date "schedule_as_of"
+    t.string "schedule_source"
+    t.text "schedule_note"
+    t.integer "fare_leg_id"
     t.index ["agency_id"], name: "index_routes_on_agency_id"
+    t.index ["fare_leg_id"], name: "index_routes_on_fare_leg_id"
     t.index ["gtfs_id"], name: "index_routes_on_gtfs_id", unique: true
     t.index ["vihicle_id"], name: "index_routes_on_vihicle_id"
   end
@@ -211,16 +341,26 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_17_091001) do
     t.index ["slug"], name: "index_vihicles_on_slug", unique: true
   end
 
+  add_foreign_key "fare_legs", "stops", column: "from_stop_id"
+  add_foreign_key "fare_legs", "stops", column: "to_stop_id"
+  add_foreign_key "fare_legs", "vihicles"
   add_foreign_key "fare_rules", "fares"
   add_foreign_key "fare_rules", "routes"
   add_foreign_key "fares", "agencies"
   add_foreign_key "fares", "stops"
   add_foreign_key "frequencies", "trips"
   add_foreign_key "histories", "trips"
+  add_foreign_key "place_access_legs", "fare_legs"
+  add_foreign_key "place_access_legs", "places"
   add_foreign_key "place_categories", "categories"
   add_foreign_key "place_categories", "places"
+  add_foreign_key "place_fees", "places"
+  add_foreign_key "place_images", "places"
+  add_foreign_key "place_vihicles", "places"
+  add_foreign_key "place_vihicles", "vihicles"
   add_foreign_key "places", "stops"
   add_foreign_key "routes", "agencies"
+  add_foreign_key "routes", "fare_legs"
   add_foreign_key "routes", "vihicles"
   add_foreign_key "service_exceptions", "services"
   add_foreign_key "stop_times", "stops"
