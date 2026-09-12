@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react'
-import { Display, Muted } from './ui/Text'
+import { useState, useEffect, createContext } from 'react'
 import { useSearchParams } from "react-router";
 import { Island } from './components/Island/Island';
-import  IslandMap from './components/Island/IslandMap'
-import { toIslandKey } from './components/Island/island-paths';
-import { Search } from './components/Search/Search';
 import DynamicIsland from './components/Island/DynamicIsland';
+import IslandSelector from './components/Island/IslandSelector';
+import { createPortal } from "react-dom"
+import { Display, Muted } from './ui';
+import PlaceModalContent from './components/Place/PlaceModalContent';
+import Modal from './components/Modal';
 export type CategoryItem = {
   id: number
   name: string
@@ -120,7 +121,7 @@ export type Prominence = {
 export type PlaceItem = {
   id: number
   external_id: string
-  name: string
+  name: string | undefined
   description: string | null
   latitude: number | null
   longitude: number | null
@@ -213,14 +214,23 @@ export type Bundle = {
   meta: BundleMeta
 }
 
-function App() {
+type ModalContentContextType = {
+  closePlaceModal: () => void
+  openPlaceModal: () => void
+  placeModal: boolean
+}
+
+export const ModalContext = createContext<ModalContentContextType | null>(null)
+
+function App() { 
   const [bundle, setBundle ] = useState<Bundle>()
   const [islandParams, setIslandParams] = useSearchParams();
-  const islandQuery = islandParams.get('island') 
-  const handleSetIslandParams = (island: string) => {
-    setIslandParams({ island: island.toLocaleLowerCase()})
-  }
-
+  const [islandSelectorVisibility, setIslandSelectorVisibility] = useState(false)
+  const [currentSelectedPlace, setCurrentSelectedPlace] = useState<PlaceItem | null>(null)
+  const islandQuery = islandParams.get('island') || "masbate"
+  const [placeModal, setPlaceModal] = useState(false)
+  const root = document.querySelector("#root")
+  
   async function fetchCategories() {
     const data = await fetch('http://localhost:3000/api/v1/bundles', {
       method: 'GET'
@@ -229,39 +239,51 @@ function App() {
     setBundle(bundleData)
   }
   useEffect(() => { 
+    // set default island to masbate 
+    if(!islandQuery) setIslandParams({ island: 'masbate'})
     fetchCategories()
   }, [])
 
-  return (
-    <div>
-      {/* One column on phones, two side by side from lg. `min-h-dvh` rather
-          than `h-screen` so mobile browser chrome doesn't crop the page. */}
-      <DynamicIsland />
-      {/* {bundle && <Search bundle={bundle} />} */}
-      {/* island switch (modal) */}
-      <div className="mx-auto flex w-full max-w-6xl flex-col items-center justify-center gap-6 px-5 py-8 sm:px-8 sm:py-12 lg:h-dvh lg:max-w-none lg:flex-row lg:gap-10 lg:p-20">
-        <div className="flex w-full items-center justify-center lg:w-1/2">
-          <IslandMap
-            className="max-w-[15rem] sm:max-w-xs lg:max-w-md"
-            onSelect={handleSetIslandParams}
-            selected={toIslandKey(islandQuery)}
-          />
-        </div>
-        <div className="w-full lg:w-1/2">
-          <Display className='lg:font-medium' size={"xxl"} >
-            Which island
-            <br/>
-            are you on?
+  const closePlaceModal = () => {
+    setPlaceModal(false)
+  }
+
+  const openPlaceModal = () => {
+    setPlaceModal(true)
+  }
+
+  const openIslandModal = () => {
+    setIslandSelectorVisibility(true)
+  }
+
+  const closeIslandModal = () => {
+    setIslandSelectorVisibility(false)
+  }
+
+
+  return ( 
+    <>
+      {bundle ? 
+        <div className="flex flex-col gap-3 mx-auto w-full max-w-7xl p-10 items-start h-screen">
+          <Display size="xxl">
+            Where are you
+            going today?
           </Display>
-          <Muted className='my-2 max-w-prose' >
-            Fares, terminals and crossings differ by island. Pick one to start
-            {/* Hard break only where the line is wide enough to want one. */}
-            <br className="hidden lg:inline" /> you can switch any time.
+          <Muted className='text-left hidden lg:block' size="lg">
+            Pick your island, then a place. We show the best ride, the fare and where to board.
           </Muted>
-          <Island handleSetIslandParams={handleSetIslandParams} islands={bundle?.islands} />
+          <ModalContext value={{openPlaceModal: openPlaceModal, placeModal: placeModal, closePlaceModal: closePlaceModal}}>
+          {(placeModal && currentSelectedPlace) && <Modal closePlaceModal={closePlaceModal}><PlaceModalContent currentSelectedPlace={currentSelectedPlace} /></Modal> }
+          {/* One column on phones, two side by side from lg. `min-h-dvh` rather
+              than `h-screen` so mobile browser chrome doesn't crop the page. */}
+          {<DynamicIsland openIslandModal={openIslandModal} places={bundle.places} setCurrentSelectedPlace={setCurrentSelectedPlace} currentSelectedPlace={currentSelectedPlace} />}
+          {/* island switch (modal) */}
+          {(islandSelectorVisibility) && <Modal closePlaceModal={closeIslandModal}><IslandSelector bundle={bundle} /></Modal>}
+        </ModalContext>
         </div>
-      </div>
-    </div>
+ 
+    : <>Something went wrong</> }
+    </>
   )
 }
 

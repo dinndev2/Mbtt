@@ -13,7 +13,7 @@ export function Chip({
       type="button"
       aria-pressed={active}
       className={cn(
-        'rounded-pill px-4 py-2 text-sm font-medium transition-colors',
+        'rounded-pill px-4 py-2 text-sm font-medium transition-colors self-start',
         active ? 'bg-venice text-white' : 'bg-chip text-ink hover:bg-venice-pale',
         className,
       )}

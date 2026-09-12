@@ -68,6 +68,52 @@
   --radius-card: 26px;
   --radius-card-lg: 30px;
   --radius-pill: 999px;
+
+  /* ---- Motion ---------------------------------------------------------
+     The panel rises a little and settles, rather than growing from a point.
+     The scale is deliberately shallow - past about 0.94 it reads as a zoom
+     rather than as a surface arriving. The easing is a hard decelerate, so
+     most of the distance is covered in the first few frames.
+
+     Exit is faster than enter and travels less. Dismissing should feel
+     immediate; only the arrival is worth watching. `forwards` holds the last
+     frame for the tick between the animation ending and React unmounting. */
+  --animate-in: modal-in 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-out: modal-out 0.16s cubic-bezier(0.4, 0, 1, 1) forwards;
+  --animate-backdrop-in: backdrop-in 0.28s ease-out;
+  --animate-backdrop-out: backdrop-out 0.16s ease-in forwards;
+
+  @keyframes modal-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.97);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes modal-out {
+    from {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(4px) scale(0.98);
+    }
+  }
+
+  @keyframes backdrop-in {
+    from { opacity: 0 }
+    to { opacity: 1 }
+  }
+
+  @keyframes backdrop-out {
+    from { opacity: 1 }
+    to { opacity: 0 }
+  }
 }
 
 @layer base {
@@ -103,5 +149,19 @@
   :focus-visible {
     outline: 2px solid var(--color-venice);
     outline-offset: 2px;
+  }
+}
+
+/* Unlayered, so this wins over the utilities Tailwind emits in @layer.
+
+   Note this shortens the animations rather than removing them: the modal
+   unmounts on `animationend`, so an `animation: none` here would leave it
+   stuck open for anyone who has asked for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-in,
+  .animate-out,
+  .animate-backdrop-in,
+  .animate-backdrop-out {
+    animation-duration: 0.01s;
   }
 }
