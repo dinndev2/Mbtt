@@ -1,15 +1,49 @@
 place_id,seq,local_path,bytes,width,license,attribution,source_page,commons_file
-P_BUNTOD,1,/images/places/p_buntod-1.jpg,223560,1200,CC BY-SA 4.0,Johrabino,https://commons.wikimedia.org/wiki/File:BUNTOD_MASBATE_SANDBAR.jpg,File:BUNTOD MASBATE SANDBAR.jpg
-P_BUNTOD,2,/images/places/p_buntod-2.jpg,214788,1200,CC BY-SA 4.0,Bert Andone,https://commons.wikimedia.org/wiki/File:Buntod_Reef_Marine_Sanctuary_%26_Sandbar.jpg,File:Buntod Reef Marine Sanctuary & Sandbar.jpg
-P_SOMBRERO,1,/images/places/p_sombrero-1.jpg,318147,1200,CC BY-SA 4.0,Maffeth.opiana,https://commons.wikimedia.org/wiki/File:Sombrero_Island.jpg,File:Sombrero Island.jpg
-P_SOMBRERO,2,/images/places/p_sombrero-2.jpg,401238,1200,CC BY-SA 4.0,Derk29,https://commons.wikimedia.org/wiki/File:Sombrero_Island_Beach.jpg,File:Sombrero Island Beach.jpg
-P_ANIMASOLA,1,/images/places/p_animasola-1.jpg,292479,1200,CC BY-SA 4.0,Glenn Rivera,https://commons.wikimedia.org/wiki/File:Animasola_Island_Rock_Formation_01.jpg,File:Animasola Island Rock Formation 01.jpg
-P_ANIMASOLA,2,/images/places/p_animasola-2.jpg,356126,1200,CC BY-SA 4.0,Irvin Parco Sto. Tomas,"https://commons.wikimedia.org/wiki/File:Animasola_Island,_Masbate_1.jpg","File:Animasola Island, Masbate 1.jpg"
-P_TINALISAYAN,1,/images/places/p_tinalisayan-1.jpg,336945,1200,CC BY-SA 4.0,Derk29,https://commons.wikimedia.org/wiki/File:Tinalisayan_Island.jpg,File:Tinalisayan Island.jpg
-P_TINALISAYAN,2,/images/places/p_tinalisayan-2.jpg,314389,1200,CC BY-SA 4.0,Irvin Parco Sto. Tomas,"https://commons.wikimedia.org/wiki/File:Sandbar_at_Tinalisayan_Island_in_San_Pascual,_Masbate.jpg","File:Sandbar at Tinalisayan Island in San Pascual, Masbate.jpg"
-P_MASBATE_CATHEDRAL,1,/images/places/p_masbate_cathedral-1.jpg,336674,1200,CC BY-SA 4.0,Benedict Esber,https://commons.wikimedia.org/wiki/File:Masbate_Cathedral.jpg,File:Masbate Cathedral.jpg
-P_MASBATE_CATHEDRAL,2,/images/places/p_masbate_cathedral-2.jpg,224509,1200,CC BY-SA 3.0,Mootboot12,https://commons.wikimedia.org/wiki/File:Masbate_Cathedral_-_Exterior_View.jpg,File:Masbate Cathedral - Exterior View.jpg
-P_GAWAS_BEACH,1,/images/places/p_gawas_beach-1.jpg,473527,1200,CC BY-SA 3.0,Reygel Perales,"https://commons.wikimedia.org/wiki/File:Gawas_beach,_Esperanza,_Masbate,_Philippines.jpg","File:Gawas beach, Esperanza, Masbate, Philippines.jpg"
-P_GAWAS_BEACH,2,/images/places/p_gawas_beach-2.jpg,813462,1200,CC BY-SA 3.0,Reygel Perales,"https://commons.wikimedia.org/wiki/File:The_Baruto(canoe)_Gawas_beach,_Esperanza,_Masbate,_Philippines.jpg","File:The Baruto(canoe) Gawas beach, Esperanza, Masbate, Philippines.jpg"
-P_MANTA_BOWL,1,/images/places/p_manta_bowl-1.jpg,154188,1200,CC BY-SA 4.0,JoseZander Servando,https://commons.wikimedia.org/wiki/File:Sunset_at_Ticao_Pass.jpg,File:Sunset at Ticao Pass.jpg
-P_LAPUSLAPUS,1,/images/places/p_lapuslapus-1.jpg,407060,1200,CC BY-SA 4.0,Denica Daniel Catapat,https://commons.wikimedia.org/wiki/File:Beauty_of_Ticao_Island.jpg,File:Beauty of Ticao Island.jpg
+P_BUNTOD,1,/images/places/p_buntod-1.jpg,246441,1200,CC BY-SA 4.0,Johrabino,https://commons.wikimedia.org/wiki/File:BUNTOD_MASBATE_SANDBAR.jpg,File:BUNTOD MASBATE SANDBAR.jpg
+P_BUNTOD,2,/images/places/p_buntod-2.jpg,207193,1200,CC BY-SA 4.0,Bert Andone,https://commons.wikimedia.org/wiki/File:Buntod_Reef_Marine_Sanctuary_%26_Sandbar.jpg,File:Buntod Reef Marine Sanctuary & Sandbar.jpg
+P_PAWA,1,/images/places/p_pawa-1.jpg,183464,700,unverified,langyaw.com,https://langyaw.com/2013/10/20/1-7-km-bamboo-footbridge-masbate-city/,
+P_PAWA,2,/images/places/p_pawa-2.jpg,439181,1024,unverified,justinvawter.com,https://justinvawter.com/budget-guide/explore-masbate/,
+P_MASBATE_CATHEDRAL,1,/images/places/p_masbate_cathedral-1.jpg,368887,1200,CC BY-SA 4.0,Benedict Esber,https://commons.wikimedia.org/wiki/File:Masbate_Cathedral.jpg,File:Masbate Cathedral.jpg
+P_MASBATE_CATHEDRAL,2,/images/places/p_masbate_cathedral-2.jpg,248361,1200,CC BY-SA 3.0,Mootboot12,https://commons.wikimedia.org/wiki/File:Masbate_Cathedral_-_Exterior_View.jpg,File:Masbate Cathedral - Exterior View.jpg
+P_MAYONG_PAYONG,1,/images/places/p_mayong_payong-1.jpg,171959,1200,unverified,shammieragos.blogspot.com,https://shammieragos.blogspot.com/2017/02/travel-mt-mayong-payong-mobo-masbate.html,
+P_MAYONG_PAYONG,2,/images/places/p_mayong_payong-2.jpg,174929,1200,unverified,shammieragos.blogspot.com,https://shammieragos.blogspot.com/2017/02/travel-mt-mayong-payong-mobo-masbate.html,
+P_BATONGAN_CAVE,1,/images/places/p_batongan_cave-1.jpg,97613,900,unverified,bicoltravelguides.com,https://bicoltravelguides.com/climb-through-time-at-bat-ongan-cave-in-masbate/,
+P_BATONGAN_CAVE,2,/images/places/p_batongan_cave-2.jpg,100449,700,unverified,outoftownblog.com,https://outoftownblog.com/masbate-tourist-spots/,
+P_PALANI_BEACH,1,/images/places/p_palani_beach-1.jpg,306729,1200,unverified,tripadvisor.com.ph,https://www.tripadvisor.com.ph/Attraction_Review-g8126282-d4346511-Reviews-Palani_White_Beach-Balud_Masbate_Island_Masbate_Province_Bicol_Region_Luzon.html,
+P_PALANI_BEACH,2,/images/places/p_palani_beach-2.jpg,305545,1200,unverified,tripadvisor.com.ph,https://www.tripadvisor.com.ph/Attraction_Review-g8126282-d4346511-Reviews-Palani_White_Beach-Balud_Masbate_Island_Masbate_Province_Bicol_Region_Luzon.html,
+P_BUGUI_LIGHTHOUSE,1,/images/places/p_bugui_lighthouse-1.jpg,195700,1024,unverified,tripadvisor.at,https://www.tripadvisor.at/Attraction_Review-g6103862-d9696123-Reviews-Aroroy_Lighthouse-Masbate_Island_Masbate_Province_Bicol_Region_Luzon.html,
+P_BUGUI_LIGHTHOUSE,2,/images/places/p_bugui_lighthouse-2.jpg,148857,900,unverified,bicoltravelguides.com,https://bicoltravelguides.com/bugui-point-lighthouse-a-glimpse-into-masbates-maritime-past/,
+P_BUSAY_DE_GRACIA,1,/images/places/p_busay_de_gracia-1.jpg,160019,700,unverified,outoftownblog.com,https://outoftownblog.com/masbate-tourist-spots/,
+P_BUSAY_DE_GRACIA,2,/images/places/p_busay_de_gracia-2.jpg,97313,720,unverified,jontotheworld.com,https://jontotheworld.com/best-masbate-tourist-spots/,
+P_PORTA_VEGA,1,/images/places/p_porta_vega-1.jpg,152939,1024,unverified,shammieragos.blogspot.com,https://shammieragos.blogspot.com/2014/04/summer-2014-porta-vega-beach-resort.html,
+P_PORTA_VEGA,2,/images/places/p_porta_vega-2.jpg,71034,960,unverified,it.pinterest.com,https://it.pinterest.com/pin/porta-vega-dimasalang-masbate--71846556535092676/,
+P_NAGARAO,1,/images/places/p_nagarao-1.jpg,274885,1200,unverified,buzzsetter.com,https://buzzsetter.com/best-masbate-tourist-spots/,
+P_NAGARAO,2,/images/places/p_nagarao-2.jpg,177667,1200,unverified,tripadvisor.com,https://www.tripadvisor.com/Attraction_Review-g6103862-d7182973-Reviews-Nagarao_Island-Masbate_Island_Masbate_Province_Bicol_Region_Luzon.html,
+P_MATAYUM,1,/images/places/p_matayum-1.jpg,192054,1200,unverified,catainganmasbate.gov.ph,https://catainganmasbate.gov.ph/,
+P_MATAYUM,2,/images/places/p_matayum-2.jpg,277170,1200,unverified,mindtrip.ai,https://mindtrip.ai/attraction/cataingan-luzon/masbate-lagoon/at-ME21Acy9,
+P_LA_MANOK,1,/images/places/p_la_manok-1.jpg,249766,1200,unverified,shammieragos.blogspot.com,https://shammieragos.blogspot.com/2021/06/island-hopping-la-manok-island-masbate.html,
+P_LA_MANOK,2,/images/places/p_la_manok-2.jpg,288518,1200,unverified,shammieragos.blogspot.com,https://shammieragos.blogspot.com/2021/06/island-hopping-la-manok-island-masbate.html,
+P_GAWAS_BEACH,1,/images/places/p_gawas_beach-1.jpg,496868,1200,CC BY-SA 3.0,Reygel Perales,"https://commons.wikimedia.org/wiki/File:Gawas_beach,_Esperanza,_Masbate,_Philippines.jpg","File:Gawas beach, Esperanza, Masbate, Philippines.jpg"
+P_GAWAS_BEACH,2,/images/places/p_gawas_beach-2.jpg,792337,1200,CC BY-SA 3.0,Reygel Perales,"https://commons.wikimedia.org/wiki/File:The_Baruto(canoe)_Gawas_beach,_Esperanza,_Masbate,_Philippines.jpg","File:The Baruto(canoe) Gawas beach, Esperanza, Masbate, Philippines.jpg"
+P_MATANG_TUBIG,1,/images/places/p_matang_tubig-1.jpg,304410,1024,unverified,flickr.com,https://www.flickr.com/photos/136561464@N06/21593987499,
+P_MATANG_TUBIG,2,/images/places/p_matang_tubig-2.jpg,206576,800,unverified,daisyruado.blogspot.com,https://daisyruado.blogspot.com/,
+P_HALEA,1,/images/places/p_halea-1.jpg,456037,1024,unverified,flickr.com,https://www.flickr.com/photos/gabzki/34191821030,
+P_HALEA,2,/images/places/p_halea-2.jpg,375590,1200,unverified,rizzasalas.blogspot.com,https://rizzasalas.blogspot.com/2017/09/Masbate2017.html,
+P_CATANDAYAGAN,1,/images/places/p_catandayagan-1.jpg,280881,1200,unverified,tripadvisor.at,https://www.tripadvisor.at/Attraction_Review-g3830444-d8132861-Reviews-Catandayagan_Falls-Ticao_Island_Masbate_Province_Bicol_Region_Luzon.html,
+P_CATANDAYAGAN,2,/images/places/p_catandayagan-2.jpg,332878,1023,unverified,flickr.com,https://www.flickr.com/photos/md_mc/13962159973/,
+P_BURUBANGKASO,1,/images/places/p_burubangkaso-1.jpg,482296,1200,unverified,tripadvisor.com,https://www.tripadvisor.com/Attraction_Review-g667127-d25239837-Reviews-Borobangcaso_Islet-Masbate_City_Masbate_Island_Masbate_Province_Bicol_Region_Luz.html,
+P_BURUBANGKASO,2,/images/places/p_burubangkaso-2.jpg,480495,1200,unverified,tripadvisor.es,https://www.tripadvisor.es/Attraction_Review-g667127-d25239837-Reviews-Borobangcaso_Islet-Masbate_City_Masbate_Island_Masbate_Province_Bicol_Region_Luz.html,
+P_LAPUSLAPUS,1,/images/places/p_lapuslapus-1.jpg,425415,1200,CC BY-SA 4.0,Denica Daniel Catapat,https://commons.wikimedia.org/wiki/File:Beauty_of_Ticao_Island.jpg,File:Beauty of Ticao Island.jpg
+P_LAPUSLAPUS,2,/images/places/p_lapuslapus-2.jpg,79956,700,unverified,outoftownblog.com,https://outoftownblog.com/masbate-tourist-spots/,
+P_BONGSANGLAY,1,/images/places/p_bongsanglay-1.jpg,179440,1200,unverified,7641islands.ph,https://www.7641islands.ph/explore/visiting-bongsanglay-natural-park/,
+P_BONGSANGLAY,2,/images/places/p_bongsanglay-2.jpg,182416,1024,unverified,7641islands.ph,https://www.7641islands.ph/explore/visiting-bongsanglay-natural-park/,
+P_MANTA_BOWL,1,/images/places/p_manta_bowl-1.jpg,159434,1200,CC BY-SA 4.0,JoseZander Servando,https://commons.wikimedia.org/wiki/File:Sunset_at_Ticao_Pass.jpg,File:Sunset at Ticao Pass.jpg
+P_MANTA_BOWL,2,/images/places/p_manta_bowl-2.jpg,81815,1200,unverified,islandhoppinginthephilippines.com,https://islandhoppinginthephilippines.com/visayas/faq/diving-ticao-pass-masbate/,
+P_ANIMASOLA,1,/images/places/p_animasola-1.jpg,279149,1200,CC BY-SA 4.0,Glenn Rivera,https://commons.wikimedia.org/wiki/File:Animasola_Island_Rock_Formation_01.jpg,File:Animasola Island Rock Formation 01.jpg
+P_ANIMASOLA,2,/images/places/p_animasola-2.jpg,336634,1200,CC BY-SA 4.0,Irvin Parco Sto. Tomas,"https://commons.wikimedia.org/wiki/File:Animasola_Island,_Masbate_1.jpg","File:Animasola Island, Masbate 1.jpg"
+P_SOMBRERO,1,/images/places/p_sombrero-1.jpg,342974,1200,CC BY-SA 4.0,Maffeth.opiana,https://commons.wikimedia.org/wiki/File:Sombrero_Island.jpg,File:Sombrero Island.jpg
+P_SOMBRERO,2,/images/places/p_sombrero-2.jpg,421842,1200,CC BY-SA 4.0,Derk29,https://commons.wikimedia.org/wiki/File:Sombrero_Island_Beach.jpg,File:Sombrero Island Beach.jpg
+P_TINALISAYAN,1,/images/places/p_tinalisayan-1.jpg,355641,1200,CC BY-SA 4.0,Derk29,https://commons.wikimedia.org/wiki/File:Tinalisayan_Island.jpg,File:Tinalisayan Island.jpg
+P_TINALISAYAN,2,/images/places/p_tinalisayan-2.jpg,294091,1200,CC BY-SA 4.0,Irvin Parco Sto. Tomas,"https://commons.wikimedia.org/wiki/File:Sandbar_at_Tinalisayan_Island_in_San_Pascual,_Masbate.jpg","File:Sandbar at Tinalisayan Island in San Pascual, Masbate.jpg"
+P_DAPA,1,/images/places/p_dapa-1.jpg,127623,960,unverified,jontotheworld.com,https://jontotheworld.com/dapa-burias-island-masbate/,
+P_DAPA,2,/images/places/p_dapa-2.jpg,376819,1200,unverified,tripadvisor.nl,https://www.tripadvisor.nl/Attraction_Review-g667126-d26328927-Reviews-Dapa_or_Snake_Island-Burias_Island_Masbate_Province_Bicol_Region_Luzon.html,
