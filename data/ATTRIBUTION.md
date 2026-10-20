@@ -3,7 +3,8 @@
 Images in `frontend/public/images/places/` come from two places, and they are
 **not** interchangeable. Check which list a file is in before you reuse it.
 
-The API serves `images[].credit` on each place from `attribution` + `license`.
+The API serves `images[].credit` on each place and each stop in the bundle's
+`stops` directory, from `attribution` + `license` (`Image#credit`).
 Don't drop it.
 
 ## 1. Wikimedia Commons -- CC BY-SA, safe to publish
@@ -100,3 +101,59 @@ supplies one.
 
 48 images over 24 of 33 places:
 14 from Commons, 34 from the open web. 9 places have none.
+
+## 4. Stop photos -- Wikimedia Commons, safe to publish
+
+Images in `frontend/public/images/stops/`, listed in `stop_images.csv`.
+Downloaded 2026-10-02 from the 1280px Commons thumbnail and scaled to 1200px
+locally -- Commons no longer serves a 1200px step. Same rules as section 1:
+the credit must appear wherever the photo is displayed, and a file's licence
+on Commons can change, so re-check before publishing. There is no open-web
+tier for stops; a stop without a Commons photo simply has none.
+
+`Masbate Port 1.jpg` is titled and categorised as Masbate City's port on
+Commons, but its geotag and its scenery are San Pascual on Burias, so it is
+filed under `S_SANPASCUAL_PORT` here.
+
+| Stop | File | Photographer | Licence | Source |
+| --- | --- | --- | --- | --- |
+| Masbate City Port | `s_masbate_port-1.jpg` | Patrickroque01 | CC BY-SA 4.0 | [Commons](https://commons.wikimedia.org/wiki/File:Masbate_Port_(Masbate_City;_04-12-2024).jpg) |
+| Masbate City Port | `s_masbate_port-2.jpg` | Patrickroque01 | CC BY-SA 4.0 | [Commons](https://commons.wikimedia.org/wiki/File:Masbate_City_skyline_port_area_(Masbate_City;_04-12-2024).jpg) |
+| Buntod Sandbar | `s_buntod_sandbar-1.jpg` | Bert Andone | CC BY-SA 4.0 | [Commons](https://commons.wikimedia.org/wiki/File:Buntod_Reef_Marine_Sanctuary.jpg) |
+| Buntod Sandbar | `s_buntod_sandbar-2.jpg` | Mark arcelo | CC BY-SA 4.0 | [Commons](https://commons.wikimedia.org/wiki/File:Buntod_Beach_Resort.jpg) |
+| San Pascual Poblacion | `s_sanpascual_pob-1.jpg` | Ringer | CC BY-SA 4.0 | [Commons](https://commons.wikimedia.org/wiki/File:San_Pascual.jpg) |
+| San Pascual Poblacion | `s_sanpascual_pob-2.jpg` | Ringer (Central Bikol Wikipedia) | CC BY-SA 3.0 | [Commons](https://commons.wikimedia.org/wiki/File:Munisipyo_kan_San_Pascualo.jpg) |
+| San Pascual Port | `s_sanpascual_port-1.jpg` | Maffeth.opiana | CC BY-SA 4.0 | [Commons](https://commons.wikimedia.org/wiki/File:Masbate_Port_1.jpg) |
+| San Pascual Port | `s_sanpascual_port-2.jpg` | MarvinBikolano | CC BY-SA 4.0 | [Commons](https://commons.wikimedia.org/wiki/File:Part_of_the_port_of_San_Pascual,_Masbate.jpg) |
+| Pio Duran Port | `s_pioduran_port-1.jpg` | Patrickroque01 | CC BY-SA 4.0 | [Commons](https://commons.wikimedia.org/wiki/File:Pio_Duran_skyline_sea_view_(Pio_Duran,_Albay;_04-12-2024).jpg) |
+| Pasacao Port | `s_pasacao_port-1.jpg` | BiancaBrazal | CC BY-SA 4.0 | [Commons](https://commons.wikimedia.org/wiki/File:View_of_Pasacao_port.jpg) |
+
+10 images over 6 of 34 stops.
+
+## 5. Stop photos from Flickr (via Openverse) -- searched, none qualified
+
+Searched 2026-10-02 through the Openverse API
+(`license=by,by-sa,cc0,pdm`, Wikimedia excluded because section 4 already
+covers it), by keyword and by Flickr tag, for every stop with fewer than two
+photos. The rule was the same as section 4 plus one more check: the licence had
+to match on the Flickr page itself, not only in Openverse's index, and the
+uploader had to plausibly be the photographer.
+
+Nothing passed, so no stop photo comes from Flickr and `stop_images.csv` is
+unchanged. Openverse holds almost nothing openly licensed for Masbate: most
+hits are museum specimens tagged with the province, or a namesake somewhere
+else. Recorded here so the search isn't repeated blind.
+
+| Search | What came back instead |
+| --- | --- |
+| Masbate, Masbate City, port, pier, terminal | Masbat Bay in Dahab, Egypt; a Sinulog pageant in Cebu; land snails |
+| Mobo | Mobo in Kalibo, Aklan |
+| Claveria | Claveria, Cagayan; Claveria Street, Davao; resized stock with numeric file names |
+| Ticao, San Jacinto, Monreal | a Brazilian bar nicknamed Ticão; San Jacinto, Pangasinan; the Monreal Stones in a museum |
+| Pilar, Sorsogon | one outrigger on still water in Pilar Bay, not the port |
+| Bulan, Pio Duran, Pasacao, San Andres | nothing in the Philippines, or nothing at all |
+| Every other town, Nagarao, Porta Vega, Bugui, Bat-ongan, Pawa, Rendezvous | no results |
+
+The only openly licensed Masbate scenery Openverse returned is four beach and pasture
+shots by one uploader (Palani Beach, unnamed coast, cattle pasture) -- places,
+not stops.
