@@ -13,11 +13,11 @@ class Place < ApplicationRecord
   has_many :place_access_legs, dependent: :destroy
   has_many :fare_legs, through: :place_access_legs
   has_many :place_fees, dependent: :destroy
-  has_many :place_images, dependent: :destroy
+  has_many :images, as: :imageable, dependent: :destroy
 
   scope :surveyed,     -> { where(coord_status: "verified") }
   scope :needs_survey, -> { where(coord_status: %w[needs_survey town_centroid]) }
-  scope :with_images,  -> { where(id: PlaceImage.select(:place_id)) }
+  scope :with_images,  -> { where(id: Image.where(imageable_type: "Place").select(:imageable_id)) }
   scope :on_island,    ->(island) { where("LOWER(island) = ?", island.to_s.downcase) }
 
   # How well known a place is, measured as published coverage. Nothing here

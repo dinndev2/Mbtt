@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_08_25_090000) do
+ActiveRecord::Schema[8.0].define(version: 2026_10_02_100000) do
   create_table "advisories", force: :cascade do |t|
     t.string "external_id", null: false
     t.string "scope", null: false
@@ -70,6 +70,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_25_090000) do
     t.text "notes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "schedule_kind", default: "unknown", null: false
+    t.string "departures_out"
+    t.string "departures_back"
+    t.string "service_start"
+    t.string "service_end"
+    t.integer "headway_min"
+    t.string "service_days"
+    t.string "schedule_confidence", default: "unknown", null: false
+    t.date "schedule_as_of"
+    t.string "schedule_source"
+    t.text "schedule_note"
     t.index ["external_id"], name: "index_fare_legs_on_external_id", unique: true
     t.index ["from_stop_id"], name: "index_fare_legs_on_from_stop_id"
     t.index ["to_stop_id"], name: "index_fare_legs_on_to_stop_id"
@@ -124,11 +135,42 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_25_090000) do
     t.index ["user_id"], name: "index_histories_on_user_id"
   end
 
+  create_table "images", force: :cascade do |t|
+    t.integer "imageable_id", null: false
+    t.integer "seq", null: false
+    t.string "local_path", null: false
+    t.string "license", null: false
+    t.string "attribution"
+    t.string "source_page"
+    t.integer "bytes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "imageable_type", null: false
+    t.string "caption"
+    t.index ["imageable_type", "imageable_id", "seq"], name: "index_images_on_imageable_type_and_imageable_id_and_seq", unique: true
+  end
+
   create_table "islands", force: :cascade do |t|
     t.string "name"
     t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "last_trips", force: :cascade do |t|
+    t.integer "fare_leg_id", null: false
+    t.integer "board_stop_id", null: false
+    t.string "last_departure", null: false
+    t.boolean "overnight", default: false, null: false
+    t.string "confidence", default: "unknown", null: false
+    t.date "valid_as_of"
+    t.string "source_url"
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["board_stop_id"], name: "index_last_trips_on_board_stop_id"
+    t.index ["fare_leg_id", "board_stop_id"], name: "index_last_trips_on_fare_leg_id_and_board_stop_id", unique: true
+    t.index ["fare_leg_id"], name: "index_last_trips_on_fare_leg_id"
   end
 
   create_table "place_access_legs", force: :cascade do |t|
@@ -171,20 +213,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_25_090000) do
     t.datetime "updated_at", null: false
     t.index ["external_id"], name: "index_place_fees_on_external_id", unique: true
     t.index ["place_id"], name: "index_place_fees_on_place_id"
-  end
-
-  create_table "place_images", force: :cascade do |t|
-    t.integer "place_id", null: false
-    t.integer "seq", null: false
-    t.string "local_path", null: false
-    t.string "license", null: false
-    t.string "attribution"
-    t.string "source_page"
-    t.integer "bytes"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["place_id", "seq"], name: "index_place_images_on_place_id_and_seq", unique: true
-    t.index ["place_id"], name: "index_place_images_on_place_id"
   end
 
   create_table "place_vihicles", force: :cascade do |t|
@@ -306,8 +334,23 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_25_090000) do
     t.integer "wheelchair_boarding", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "island"
+    t.string "role"
+    t.string "port_authority"
+    t.string "navigation"
+    t.string "serves"
+    t.string "operators"
+    t.string "facilities"
+    t.string "ticketing"
+    t.integer "arrive_before_min"
+    t.text "notes"
+    t.string "detail_confidence"
+    t.date "detail_as_of"
+    t.string "detail_source"
     t.index ["gtfs_id"], name: "index_stops_on_gtfs_id", unique: true
+    t.index ["island"], name: "index_stops_on_island"
     t.index ["parent_stop_id"], name: "index_stops_on_parent_stop_id"
+    t.index ["role"], name: "index_stops_on_role"
     t.index ["zone_id"], name: "index_stops_on_zone_id"
   end
 
@@ -350,12 +393,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_25_090000) do
   add_foreign_key "fares", "stops"
   add_foreign_key "frequencies", "trips"
   add_foreign_key "histories", "trips"
+  add_foreign_key "last_trips", "fare_legs"
+  add_foreign_key "last_trips", "stops", column: "board_stop_id"
   add_foreign_key "place_access_legs", "fare_legs"
   add_foreign_key "place_access_legs", "places"
   add_foreign_key "place_categories", "categories"
   add_foreign_key "place_categories", "places"
   add_foreign_key "place_fees", "places"
-  add_foreign_key "place_images", "places"
   add_foreign_key "place_vihicles", "places"
   add_foreign_key "place_vihicles", "vihicles"
   add_foreign_key "places", "stops"

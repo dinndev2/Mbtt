@@ -66,10 +66,38 @@ csv_rows(DATA.join("gtfs", "stops.txt")).each do |row|
     latitude:            row["stop_lat"].presence,
     longitude:           row["stop_lon"].presence,
     zone_id:             row["zone_id"].presence,
+    # Which island the stop is on, from the feed's mbtt_island extension. This
+    # is what lets IslandConnection notice that a traveller is somewhere other
+    # than where an access chain silently assumes they are standing.
+    island:              row["mbtt_island"].presence,
     location_type:       GTFS_LOCATION_TYPES.fetch(row["location_type"], :boarding),
     wheelchair_boarding: GTFS_WHEELCHAIR.fetch(row["wheelchair_boarding"], :unknown)
   )
   stop.save!
+end
+
+# Terminal detail, from data/stops.csv rather than the feed. GTFS has nowhere
+# to record that Aroroy is not a RoRo port or that San Jacinto is daytime
+# navigation only, and both change whether a crossing is possible. Thirteen
+# stops carry nothing but a role; those columns stay null on purpose.
+csv_rows(DATA.join("stops.csv")).each do |row|
+  stop = Stop.find_by(gtfs_id: row["stop_id"])
+  next Rails.logger.warn("stops.csv references unknown stop #{row["stop_id"]}") unless stop
+
+  stop.update!(
+    role:              row["role"].presence,
+    port_authority:    row["port_authority"].presence,
+    navigation:        row["navigation"].presence,
+    serves:            row["serves"].presence,
+    operators:         row["operators"].presence,
+    facilities:        row["facilities"].presence,
+    ticketing:         row["ticketing"].presence,
+    arrive_before_min: row["arrive_before_min"].presence,
+    notes:             row["notes"].presence,
+    detail_confidence: row["confidence"].presence,
+    detail_as_of:      row["valid_as_of"].presence,
+    detail_source:     row["source_url"].presence
+  )
 end
 
 # ---------------------------------------------------------------------------
@@ -191,9 +219,53 @@ csv_rows(DATA.join("fare_legs.csv")).each do |row|
     confidence:     row["confidence"],
     valid_as_of:    row["valid_as_of"].presence,
     source_url:     row["source_url"].presence,
-    notes:          row["notes"].presence
+    notes:          row["notes"].presence,
+    # The timetable, taken from the research CSV rather than from the GTFS
+    # feed on purpose: README's verify list has the feed contradicted in both
+    # directions on R_RORO_MSB_PILAR and running three hours late on
+    # R_PUMP_MSB_LAGUNDI. `departures_back` in particular is the return
+    # direction the feed does not carry at all on the main gateway route.
+    schedule_kind:   row["schedule_kind"].presence || "unknown",
+    departures_out:  row["departures_out"].presence,
+    departures_back: row["departures_back"].presence,
+    service_start:   row["service_start"].presence,
+    service_end:     row["service_end"].presence,
+    headway_min:     row["headway_min"].presence,
+    service_days:    row["service_days"].presence,
+    # How far to trust the timetable above. Lives on the leg, not the route:
+    # fare_legs.csv is the corrected source and routes.txt still carries the
+    # figures it corrected.
+    schedule_confidence: row["schedule_confidence"].presence || "unknown",
+    schedule_as_of:      row["schedule_as_of"].presence,
+    schedule_source:     row["schedule_source"].presence,
+    schedule_note:       row["schedule_note"].presence
   )
   leg.save!
+end
+
+# Last trips, from data/last_trips.csv. The figure that decides whether a place
+# is a day trip, and the one a timetable cannot be trusted to imply -- see the
+# CreateLastTrips migration. Four rows today; the rest of the network either
+# derives one from a real timetable or honestly reports that nobody knows.
+csv_rows(DATA.join("last_trips.csv")).each do |row|
+  leg  = FareLeg.find_by(external_id: row["leg_id"])
+  stop = Stop.find_by(gtfs_id: row["board_stop_id"])
+  unless leg && stop
+    Rails.logger.warn("last_trips.csv row references unknown leg or stop: #{row["leg_id"]} / #{row["board_stop_id"]}")
+    next
+  end
+
+  # Not `trip` -- the sample network below binds that name to a Trip record.
+  last_trip = LastTrip.find_or_initialize_by(fare_leg: leg, board_stop: stop)
+  last_trip.assign_attributes(
+    last_departure: row["last_departure"],
+    overnight:      row["overnight"].to_s == "1",
+    confidence:     row["confidence"].presence || "unknown",
+    valid_as_of:    row["valid_as_of"].presence,
+    source_url:     row["source_url"].presence,
+    notes:          row["notes"].presence
+  )
+  last_trip.save!
 end
 
 # Operators, from the GTFS feed. Where a mode has no formal operator -- habal
@@ -315,20 +387,31 @@ end
 
 # Images bundled under frontend/public. Commons CC BY-SA plus an open-web set
 # marked `unverified`; both need their attribution to reach the UI -- see
-# PlaceImage#credit and data/ATTRIBUTION.md.
-csv_rows(DATA.join("place_images.csv")).each do |row|
-  place = Place.find_by(external_id: row["place_id"])
-  next unless place
-
-  image = PlaceImage.find_or_initialize_by(place: place, seq: row["seq"])
+# Image#credit and data/ATTRIBUTION.md.
+#
+# Places and stops share the images table but keep a CSV each, so either can
+# be corrected by hand without scrolling past the other.
+seed_image = lambda do |owner, row|
+  image = Image.find_or_initialize_by(imageable: owner, seq: row["seq"])
   image.assign_attributes(
     local_path:  row["local_path"],
     license:     row["license"],
     attribution: row["attribution"].presence,
     source_page: row["source_page"].presence,
-    bytes:       row["bytes"].presence
+    bytes:       row["bytes"].presence,
+    caption:     row["caption"].presence
   )
   image.save!
+end
+
+csv_rows(DATA.join("place_images.csv")).each do |row|
+  place = Place.find_by(external_id: row["place_id"])
+  seed_image.call(place, row) if place
+end
+
+csv_rows(DATA.join("stop_images.csv")).each do |row|
+  stop = Stop.find_by(gtfs_id: row["stop_id"])
+  seed_image.call(stop, row) if stop
 end
 
 # Operational notes -- the things a local would tell you that no fare table or
