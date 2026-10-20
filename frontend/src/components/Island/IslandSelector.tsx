@@ -8,22 +8,27 @@ import type { Bundle } from "../../App"
 
 export default function IslandSelector({bundle}: {bundle: Bundle}) {
   const [islandParams, setIslandParams] = useSearchParams();
-  const islandQuery = islandParams.get('island') 
+  const islandQuery = islandParams.get('island')
 
   const handleSetIslandParams = (island: string) => {
-    setIslandParams({ island: island.toLocaleLowerCase()})
+    // Updater form rather than a fresh object: replacing the whole search
+    // string here would drop the open place's `id` on every island switch.
+    setIslandParams((params) => {
+      params.set('island', island.toLocaleLowerCase())
+      return params
+    })
   }
 
-  return <div className="mx-auto flex w-full max-w-6xl flex-col items-center justify-center gap-6 px-5 py-8 sm:px-8 sm:py-12 lg:h-dvh lg:max-w-none lg:flex-row lg:gap-10 lg:p-20">
+  return <div className="mx-auto flex w-full flex-col items-center justify-center gap-6 px-5 pt-14 pb-8 sm:px-8 sm:py-12 lg:max-w-none lg:flex-row lg:gap-10">
     <div className="flex w-full items-center justify-center lg:w-1/2">
       <IslandMap
-        className="max-w-[15rem] sm:max-w-xs lg:max-w-md"
+        className=" sm:max-w-xs lg:max-w-md"
         onSelect={handleSetIslandParams}
         selected={toIslandKey(islandQuery)}
       />
     </div>
     <div className="w-full lg:w-1/2">
-      <Display className='lg:font-medium' size={"xxl"} >
+      <Display className='lg:font-medium' size={"xl"} >
         Which island
         <br/>
         are you on?

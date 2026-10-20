@@ -3,10 +3,11 @@ import { cn } from './cn'
 
 type Variant = 'primary' | 'secondary' | 'ghost'
 
+// The portfolio's buttons: solid ink that deepens on hover, and an outlined
+// paper pill that fills with ink.
 const VARIANTS: Record<Variant, string> = {
-  primary: 'bg-venice text-white hover:bg-venice-light',
-  // Sits on cream, so it needs the white fill to read as a control.
-  secondary: 'bg-surface text-ink border border-divider hover:bg-chip',
+  primary: 'bg-venice text-surface hover:bg-venice-deep',
+  secondary: 'bg-surface text-venice border-[1.5px] border-venice hover:bg-venice hover:text-surface',
   ghost: 'text-venice hover:bg-venice-pale',
 }
 
@@ -17,7 +18,7 @@ export function Button({
     <button
       type="button"
       className={cn(
-        'rounded-input px-5 py-3 text-sm font-medium transition-colors disabled:opacity-50',
+        'rounded-pill px-5 py-3 text-sm font-semibold transition-colors disabled:opacity-50 disabled:pointer-events-none',
         VARIANTS[variant],
         className,
       )}

@@ -2,12 +2,13 @@ import type { ComponentPropsWithRef, ElementType } from 'react'
 import { cn } from './cn'
 
 /**
- * White card floating on the cream screen. The default shape for a place, a
- * result row group, or any self-contained block.
+ * A sheet of lighter paper on the screen, edged with an ink hairline rather
+ * than lifted by a shadow. The default shape for a place, a result row group,
+ * or any self-contained block.
  */
 export function Card({ className, as, ...props }: ComponentPropsWithRef<'div'> & { as?: ElementType }) {
   const Tag = as ?? 'div'
-  return <Tag className={cn('bg-surface rounded-card', className)} {...props} />
+  return <Tag className={cn('bg-surface rounded-card border border-divider', className)} {...props} />
 }
 
 /**

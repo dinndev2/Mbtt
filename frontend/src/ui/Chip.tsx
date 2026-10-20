@@ -2,8 +2,8 @@ import type { ComponentPropsWithRef } from 'react'
 import { cn } from './cn'
 
 /**
- * A filter or tag pill. `active` flips it to Venice Blue - use it for the
- * selected category, mode, or party size.
+ * A filter or tag pill - the portfolio's `.pill`. Outlined in ink, and
+ * `active` fills it. Use it for the selected category, mode, or party size.
  */
 export function Chip({
   className, active, ...props
@@ -13,8 +13,8 @@ export function Chip({
       type="button"
       aria-pressed={active}
       className={cn(
-        'rounded-pill px-4 py-2 text-sm font-medium transition-colors self-start',
-        active ? 'bg-venice text-white' : 'bg-chip text-ink hover:bg-venice-pale',
+        'rounded-pill border-[1.5px] border-venice px-4 py-1.5 text-sm font-semibold transition-colors self-start',
+        active ? 'bg-venice text-surface' : 'bg-surface text-venice hover:bg-venice hover:text-surface',
         className,
       )}
       {...props}
@@ -34,8 +34,8 @@ export function IslandPill({
       type="button"
       aria-pressed={selected}
       className={cn(
-        'rounded-pill font-display px-5 py-2.5 text-lg capitalize transition-colors',
-        selected ? 'bg-venice text-white' : 'bg-venice-muted text-venice hover:bg-venice-light hover:text-white',
+        'rounded-pill border-[1.5px] border-venice font-display px-5 py-2 text-xl capitalize transition-colors',
+        selected ? 'bg-venice text-surface' : 'bg-surface text-venice hover:bg-venice hover:text-surface',
         className,
       )}
       {...props}
@@ -45,14 +45,15 @@ export function IslandPill({
 
 /**
  * A non-interactive tag - a category on a place card, a confidence marker.
- * Same pill shape as Chip so they line up, but it is not a button.
+ * The portfolio's `.tag-pill`: mono, hairline-outlined, so it reads as a
+ * label rather than something to press.
  */
 export function Tag({ className, tinted, ...props }: ComponentPropsWithRef<'span'> & { tinted?: boolean }) {
   return (
     <span
       className={cn(
-        'rounded-pill inline-flex items-center px-3 py-1 text-xs font-medium',
-        tinted ? 'bg-venice-pale text-venice' : 'bg-chip text-ink-soft',
+        'rounded-pill inline-flex items-center border px-2.5 py-0.5 font-mono text-[11px] font-medium tracking-wide',
+        tinted ? 'border-venice/40 bg-venice-pale text-venice' : 'border-divider bg-surface text-ink-soft',
         className,
       )}
       {...props}

@@ -25,19 +25,20 @@ export function IslandButton({ island, placeCount, handleSetIslandParams }: Isla
       aria-pressed={isCurrent}
       onClick={() => handleSetIslandParams(island.name)}
       className={cn(
-        "bg-surface rounded-card flex w-full cursor-pointer items-center gap-4 p-4 text-left transition-all sm:p-5",
-        "hover:shadow-lg active:shadow-lg",
-        // The border is on the row in both states - transparent when idle, so
-        // selecting one doesn't nudge its text over by 2px.
-        isCurrent ? "border-venice border-2 shadow-lg" : "border-2 border-transparent shadow",
+        "rounded-card flex w-full cursor-pointer items-center gap-4 p-4 text-left transition-colors sm:p-5",
+        // Same border width in both states, so selecting one doesn't nudge
+        // its text over.
+        isCurrent
+          ? "border-[1.5px] border-venice bg-venice-pale"
+          : "border-[1.5px] border-divider bg-surface hover:border-venice active:border-venice",
       )}
     >
       <span className="min-w-0 flex-1">
         <span className="flex items-center gap-2">
           <span
-            className={cn("h-2 w-2 shrink-0 rounded-full", isCurrent ? "bg-venice" : "bg-venice-muted")}
+            className={cn("h-2.5 w-2.5 shrink-0 rounded-full", isCurrent ? "bg-sun" : "border-[1.5px] border-venice/40")}
           />
-          <Display as="span" className={cn(isCurrent && "text-venice")}>
+          <Display as="span">
             {island.name}
           </Display>
         </span>
