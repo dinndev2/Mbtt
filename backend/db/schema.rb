@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_10_02_100000) do
+ActiveRecord::Schema[8.0].define(version: 2026_10_19_020327) do
   create_table "advisories", force: :cascade do |t|
     t.string "external_id", null: false
     t.string "scope", null: false
@@ -372,6 +372,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_02_100000) do
     t.datetime "updated_at", null: false
     t.integer "commuter_type", default: 0
     t.string "name"
+    t.string "password_digest"
+    t.string "email"
   end
 
   create_table "vihicles", force: :cascade do |t|
