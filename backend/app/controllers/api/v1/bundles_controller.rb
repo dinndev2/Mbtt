@@ -1,4 +1,4 @@
-class Api::V1::BundlesController < ApplicationController
+class Api::V1::BundlesController < ApplicationsController
   # One call that hands the frontend everything it needs to render the browse
   # screen: the category list to filter by, and every place with its own
   # categories, modes, images and costed ways in already nested.
