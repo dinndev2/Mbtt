@@ -1,5 +1,6 @@
 import { createContext, type ReactNode, useEffect, useState } from "react";
-
+import { useNavigate } from "react-router";
+import { Toast } from "../ui";
 type currentUser = {
   email: string
   name: string
@@ -14,8 +15,9 @@ type Error = {
 
 type AuthContextType = {
   user: currentUser | null
-  loading: boolean
+  loading: boolean 
   error: Error | null
+  setAlert: React.Dispatch<React.SetStateAction<string>> 
   login: (email: string, password: string) => Promise<void>
   logout: () => Promise<void>
 }
@@ -29,6 +31,8 @@ export default function Auth({ children }: {children: ReactNode}) {
   const [error, setError] = useState<Error | null>(null)
   const API_URL = import.meta.env.VITE_API_URL;
   const API = `${API_URL}/sessions`
+  const [alert, setAlert] = useState("")
+  const navigate = useNavigate()
 
   useEffect(() => {
     async function checkSession() {
@@ -39,6 +43,7 @@ export default function Auth({ children }: {children: ReactNode}) {
         const data = await response.json()
         if (response.ok) {
           setCurrentUser({ email: data.email, name: data.name, id: data.id })
+          navigate('/admin', { replace: true })
         }
       } finally {
         setLoading(false)
@@ -72,7 +77,6 @@ export default function Auth({ children }: {children: ReactNode}) {
     }
 
     setCurrentUser({email: data.email, name: data.name, id: data.id})
-
   }
 
   const contextData: AuthContextType = {
@@ -80,9 +84,11 @@ export default function Auth({ children }: {children: ReactNode}) {
     login: login,
     error: error,
     logout: logout,
-    loading: loading
+    loading: loading,
+    setAlert: setAlert
   }
   return <AuthContext.Provider value={contextData}>
+    <Toast message={alert} onDone={() => setAlert("")} />
     {children}
   </AuthContext.Provider>
 }

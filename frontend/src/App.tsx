@@ -1,12 +1,11 @@
 import { useState, useEffect, useMemo, useContext, createContext } from 'react'
-import { Routes, useSearchParams } from "react-router";
+import { useSearchParams } from "react-router";
 import { Island } from './components/Island/Island';
 import DynamicIsland from './components/Island/DynamicIsland';
 import IslandSelector from './components/Island/IslandSelector';
-import { Display, Muted } from './ui';
+import { Display, Loader, Muted } from './ui';
 import PlaceModalContent from './components/Place/PlaceModalContent';
 import Modal from './components/Modal';
-import { Skeleton } from './components/ui/skeleton';
 import "leaflet/dist/leaflet.css";
 
 export type CategoryItem = {
@@ -420,14 +419,6 @@ function App() {
   async function fetchBundle(from: string) {
     try {
       const url = new URL(API)
-      // `from` on the wire, not `island`. On the server the two are different
-      // questions: `from` is where the traveller is standing and decides which
-      // crossing they are shown, while `island` filters the destinations. They
-      // used to be one parameter, which quietly broke the main journey -- the
-      // selector asks "leaving from", the API took that answer and narrowed
-      // places *to* that island, and someone on Ticao could never be shown
-      // Buntod sandbar at all. Sending `from` keeps that fixed while the URL
-      // here stays the `island` the rest of the app reads.
       url.searchParams.set('from', from)
       const data = await fetch(url, { method: 'GET' })
       setBundle(await data.json())
@@ -440,31 +431,18 @@ function App() {
     }
   }
 
-  // Put the default in the URL, so everything that reads `island` agrees on
-  // first load. Without it the header falls back to "Masbate" from its own
-  // default while the island buttons, which decide `isCurrent` by comparing
-  // against the parameter, find nothing there and highlight none of them.
-  // `replace` so the default does not become a history entry the back button
-  // has to walk through.
   useEffect(() => {
     if (islandParams.get('island')) return
-
     setIslandParams((params) => {
       params.set('island', fromIsland)
       return params
     }, { replace: true })
   }, [islandParams])
 
-  // Refetched on every island change, because the island decides both which
-  // legs the traveller still has to make and which crossing they are shown -
-  // the fares themselves differ, so a stale bundle is a wrong price.
   useEffect(() => {
     fetchBundle(fromIsland)
   }, [fromIsland])
 
-  // Re-resolve whatever is open against the bundle that just arrived, so an
-  // island switch updates the fares in front of the user instead of leaving
-  // the previous island's numbers on screen.
   useEffect(() => {
     if (!bundle) return
 
@@ -514,25 +492,14 @@ function App() {
                 Masbate, Ticao or Burias - start from the island you're on. We show the boat or
                 ride, what it costs, where to board, and the last trip back.
               </Muted>
-                {/* One column on phones, two side by side from lg. `min-h-dvh` rather
-                    than `h-screen` so mobile browser chrome doesn't crop the page. */}
                 {<DynamicIsland openIslandModal={openIslandModal} places={bundle.places} setCurrentSelectedPlace={setCurrentSelectedPlace} currentSelectedPlace={currentSelectedPlace} />}
-                {/* island switch (modal) */}
             </div>
           </ModalContext>
           {(islandSelectorVisibility) && <Modal closePlaceModal={closeIslandModal}><IslandSelector bundle={bundle} /></Modal>}
           {(placeModal && currentSelectedPlace) && <Modal closePlaceModal={closePlaceModal}><PlaceModalContent currentSelectedPlace={currentSelectedPlace} /></Modal> }
           </StopsContext>
         </>
-      : <> <div className=" p-4 w-screen mx-auto h-screen flex gap-5 items-center flex-col">
-      <Skeleton className="h-48 w-full" />
-        <Skeleton className=" h-15 w-1/2" />
-        <Skeleton className=" h-15 w-1/2" />
-        <Skeleton className=" h-15 w-1/2" />
-        <Skeleton className=" h-15 w-1/2" />
-
-      </div>
-      </> }
+      : <Loader fullscreen label="Charting the crossings" /> }
     </>
   )
 }

@@ -19,7 +19,7 @@ export const searchableLabels = ["island", "name", "municipality", "fare_note"] 
 export type SearchableLabel = typeof searchableLabels[number]
 
 
-function trimString(s: any) {
+export function trimString(s: any) {
   var l=0, r=s.length -1;
   while(l < s.length && s[l] == ' ') l++;
   while(r > l && s[r] == ' ') r-=1;
@@ -38,7 +38,7 @@ function itemExists(haystack: any, needle: any) {
   return false;
 }
 
-function searchFor(places: Place, query: string): Place {
+export function searchFor(places: Place, query: string): Place {
   const flatten:any = Object.values(places).flat();
   const results: Place = []
   for(let i = 0; i < flatten.length; i++) {
@@ -96,7 +96,6 @@ export function Search({places, setCurrentSelectedPlace}: {places: Place, setCur
   }
   
   const handleQuery = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(results)
     // store the search query to params for later access
     setSearchParams((prev) =>  {
       const next = new URLSearchParams(prev);

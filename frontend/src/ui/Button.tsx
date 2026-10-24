@@ -18,7 +18,7 @@ export function Button({
     <button
       type="button"
       className={cn(
-        'rounded-pill px-5 py-3 text-sm font-semibold transition-colors disabled:opacity-50 disabled:pointer-events-none',
+        'cursor-pointer rounded-pill px-5 py-3 text-sm font-semibold transition-colors disabled:opacity-50 disabled:pointer-events-none',
         VARIANTS[variant],
         className,
       )}

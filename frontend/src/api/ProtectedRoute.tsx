@@ -1,14 +1,14 @@
-import { useNavigate, Outlet } from "react-router"
+import { Outlet, Navigate } from "react-router"
 import { useContext } from "react"
 import { AuthContext } from "./AuthContext"
+import { Loader } from "../ui"
 
 export default function ProtectedRoute() {
-  const context = useContext(AuthContext);
-  const user = context?.user
-  const navigate = useNavigate()
-  if(!user) {
-    navigate('/login', { replace: true })
-  }
+  const auth = useContext(AuthContext);
+
+  if(auth?.loading) return <Loader fullscreen label="Checking your session" />
+  if(!auth?.user) return  <Navigate to="/login" replace />
+
 
   return <Outlet />
 }

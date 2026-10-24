@@ -94,6 +94,16 @@
   --animate-page-back: page-back 0.26s cubic-bezier(0.22, 1, 0.36, 1);
   --animate-backdrop-in: backdrop-in 0.28s ease-out;
   --animate-backdrop-out: backdrop-out 0.16s ease-in forwards;
+  /* The loader's crossing. Wake and boat share Loader's 3.2s clock: sail for
+     the first 80%, hold, then fade and set off again. */
+  --animate-route-wake: route-wake 3.2s infinite;
+  --animate-route-boat: route-boat 3.2s infinite;
+  --animate-wake-bob: wake-bob 0.9s ease-in-out infinite;
+  /* Toasts drop in from the top and lift back out, with the same hard
+     decelerate as the modal. The timer bar matches Toast's 3s. */
+  --animate-toast-in: toast-in 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-toast-out: toast-out 0.2s cubic-bezier(0.4, 0, 1, 1) forwards;
+  --animate-toast-timer: toast-timer 3s linear forwards;
 
   @keyframes modal-in {
     from {
@@ -148,6 +158,42 @@
   @keyframes backdrop-out {
     from { opacity: 1 }
     to { opacity: 0 }
+  }
+
+  /* pathLength is 1, so an offset of 1 is no wake and 0 is the whole route.
+     The easing matches the boat's keySplines so the wake stays under it. */
+  @keyframes route-wake {
+    0% { stroke-dashoffset: 1; opacity: 1; animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1) }
+    80% { stroke-dashoffset: 0; opacity: 1 }
+    88% { stroke-dashoffset: 0; opacity: 1 }
+    100% { stroke-dashoffset: 0; opacity: 0 }
+  }
+
+  @keyframes route-boat {
+    0% { opacity: 0 }
+    6% { opacity: 1 }
+    88% { opacity: 1 }
+    100% { opacity: 0 }
+  }
+
+  @keyframes wake-bob {
+    0%, 100% { transform: translateY(0); opacity: 0.45 }
+    40% { transform: translateY(-3px); opacity: 1 }
+  }
+
+  @keyframes toast-in {
+    from { opacity: 0; transform: translateY(-16px) scale(0.96) }
+    to { opacity: 1; transform: translateY(0) scale(1) }
+  }
+
+  @keyframes toast-out {
+    from { opacity: 1; transform: translateY(0) scale(1) }
+    to { opacity: 0; transform: translateY(-10px) scale(0.98) }
+  }
+
+  @keyframes toast-timer {
+    from { transform: scaleX(1) }
+    to { transform: scaleX(0) }
   }
 }
 
@@ -210,9 +256,17 @@
   [class*="animate-modal-"],
   [class*="animate-sheet-"],
   [class*="animate-page-"],
+  .animate-toast-in,
+  .animate-toast-out,
   .animate-backdrop-in,
   .animate-backdrop-out {
     animation-duration: 0.01s;
+  }
+
+  /* The loader has nothing to unmount on, so it can simply stand still: the
+     wake fully drawn, and Loader shows the boat already moored. */
+  .animate-route-wake {
+    animation: none;
   }
 }
 

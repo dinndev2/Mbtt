@@ -1,6 +1,6 @@
-import { useState, useRef, useContext } from 'react'
+import { useState, useRef, useContext, useEffect } from 'react'
 import { AuthContext } from '../api/AuthContext'
-import { Button, Card, Display, Divider, Input, Label, Muted } from '../ui'
+import { Button, Card, Display, Divider, Input, Label, LoaderDots, Muted } from '../ui'
 import { replace, useNavigate } from 'react-router'
 
 const ACCESS_EMAIL = 'dinndev@gmail.com'
@@ -22,9 +22,8 @@ export default function Login() {
   const navigate = useNavigate()
   const userData = useRef<HTMLFormElement>(null)
   const auth = useContext(AuthContext)
-  const currentUser = auth?.user
   const [submitting, setSubmitting] = useState(false)
-
+ 
   async function submitSession (e: React.SubmitEvent) {
     e.preventDefault()
     const form = userData.current
@@ -47,18 +46,6 @@ export default function Login() {
 
   return <div className="mx-auto flex min-h-dvh w-full max-w-7xl flex-col items-center justify-center px-4 py-8 sm:p-10">
     <Card className="w-full max-w-md p-6 sm:p-8">
-      <Label>Admin</Label>
-      {currentUser ? <>
-        <Display as="h1" size="lg" className="mt-2">
-          You're <em>signed in</em>
-        </Display>
-        <Muted className="mt-2">
-          {currentUser.name} · {currentUser.email}
-        </Muted>
-        <Button variant="secondary" className="mt-6 w-full" onClick={() => auth?.logout()}>
-          Sign out
-        </Button>
-      </> : <>
         <Display as="h1" size="lg" className="mt-2">
           Sign <em>in</em>
         </Display>
@@ -75,8 +62,8 @@ export default function Login() {
             <Input name="password" type="password" autoComplete="current-password" required />
           </label>
           {auth?.error && <p role="alert" className="rounded-panel border border-sun bg-sun-pale px-4 py-3 text-sm text-ink">{auth.error.details}</p>}
-          <Button type="submit" className="mt-2 w-full" disabled={submitting}>
-            {submitting ? 'Signing in…' : 'Sign in'}
+          <Button type="submit" className="mt-2 inline-flex w-full items-center justify-center gap-2" disabled={submitting}>
+            {submitting ? <>Signing in <LoaderDots /></> : 'Sign in'}
           </Button>
         </form>
         <Divider className="mx-0 my-6" />
@@ -87,7 +74,7 @@ export default function Login() {
         >
           Request access
         </a>
-      </>}
+
     </Card>
   </div>
 }

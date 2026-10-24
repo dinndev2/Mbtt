@@ -1,5 +1,12 @@
 import { X } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { createContext, useRef, useState } from 'react'
+
+/**
+ * Lets anything inside a modal close it the same way the X button does, exit
+ * animation included. Each Modal provides its own, so closing one never
+ * touches another.
+ */
+export const ModalControlContext = createContext<{ requestClose: () => void } | null>(null)
 
 
 type ModalProps = {
@@ -185,7 +192,9 @@ export default function Modal({
                 inside the column, which is what makes it scroll - and what
                 gives the place sheet's fare bar an edge to stick to. */}
             <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain">
-              {children}
+              <ModalControlContext value={{ requestClose }}>
+                {children}
+              </ModalControlContext>
             </div>
           </div>
         </div>

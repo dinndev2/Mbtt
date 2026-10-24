@@ -1,4 +1,4 @@
-import { StrictMode, createContext, useContext } from 'react'
+import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
@@ -7,6 +7,8 @@ import Admin from './pages/Admin.tsx';
 import Login from './pages/Login.tsx'
 import Auth from './api/AuthContext.tsx';
 import ProtectedRoute from './api/ProtectedRoute.tsx';
+
+
 
 
 
