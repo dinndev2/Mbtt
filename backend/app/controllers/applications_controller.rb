@@ -1,5 +1,7 @@
 class ApplicationsController < ActionController::API
   include ActionController::Cookies
+  # Lets serializers build absolute URLs for uploaded photos from this request's host.
+  include ActiveStorage::SetCurrent
 
   private
 

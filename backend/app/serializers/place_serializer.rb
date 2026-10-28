@@ -4,6 +4,7 @@ class PlaceSerializer < ApplicationSerializer
       id: record.id,
       external_id: record.external_id,
       name: record.name,
+      original: record.original,
       description: record.description,
       # Decimals would otherwise serialize as strings; the map wants numbers.
       latitude: record.latitude&.to_f,

@@ -1,5 +1,5 @@
 import type { PlaceItem, Prominence } from "../../App"
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Pencil, Trash2 } from "lucide-react"
 import { ConfirmDialog, Tag } from "../../ui"
 
@@ -18,16 +18,31 @@ export default function Place({
   place,
   onEdit,
   onDelete,
+  highlightedPlaceId
 }: {
   place: PlaceItem
+  highlightedPlaceId?: number
   onEdit?: (place: PlaceItem) => void
   onDelete?: (place: PlaceItem) => void | Promise<void>
 }) {
+  const trRef = useRef<HTMLTableRowElement>(null)
+
+  useEffect(() => {
+    if(highlightedPlaceId == place.id) {
+      trRef.current?.classList.add("border-green-500")
+    
+      const removeHighlight = setTimeout(() => trRef.current?.classList.remove("border-green-500"), 3000)
+      return () => {
+        clearTimeout(removeHighlight)
+      }
+    }
+  },[highlightedPlaceId])
+
   const tier = place.prominence?.tier
   const [confirmingDelete, setConfirmingDelete] = useState(false)
 
   return (
-    <tr className="border-t border-divider transition-colors hover:bg-chip/60">
+    <tr ref={trRef} id={`${place.id}`} className="border-t transition-all border-divider hover:bg-chip/60">
       <td className={cell}>
         <div className="font-semibold text-ink">{place.name ?? "Untitled place"}</div>
         <div className="font-mono text-[11px] text-ink-soft">{place.external_id}</div>
@@ -67,14 +82,14 @@ export default function Place({
           >
             <Pencil className="size-4" />
           </button>
-          <button
+          {!place.original && <button
             type="button"
             onClick={() => setConfirmingDelete(true)}
             aria-label={`Delete ${place.name ?? "place"}`}
             className="rounded-pill p-2 text-ink-soft transition-colors hover:bg-sun-pale hover:text-ink"
           >
             <Trash2 className="size-4" />
-          </button>
+          </button> }
         </div>
         {confirmingDelete && (
           <ConfirmDialog

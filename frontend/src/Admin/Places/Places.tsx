@@ -11,67 +11,95 @@ import { useSearchParams } from "react-router";
 import { trimString } from "../../components/Search/Search";
 
 const ISLAND_FILTERS = ["All", "Masbate", "Ticao", "Burias"]
+const PAGE_SIZE = 10
 
 const headCell = "px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-venice"
 type PageActions = "right" | "left";
 
+// The table's order: search matches, by name. Pages are cut from this, so it
+// has to sort the whole list -- sorting each page on its own reorders across pages.
+function matching(places: PlaceItem[], query: string) {
+  return searchFor(places, query).sort((a, b) => (a?.name ?? "").localeCompare(b?.name ?? ""))
+}
+
 export default function Places() {
   const API_URL = import.meta.env.VITE_API_URL;
-  const [islandParams, setIslandParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [loading, setLoading] = useState(true)
   const [places, setPlaces] = useState<PlaceItem[]>([])
-  const [totalPage, setTotalPage] = useState(1)
-  const [currentPagePlace, setCurrentPagePlace] = useState<PlaceItem []>([])
-  const [page, setPage] = useState(1)
+  const [highlightedPlaceId, setHighlightedPlaceId] = useState<number>()
   const [addingPlace, setAddPlaceModalContent] = useState(false)
   const [searchValue, setSearchValue] = useState("")
   const [editingPlace, setEditingPlace] = useState<PlaceItem | null>(null)
   const API = `${API_URL}/places`
-  const island = islandParams.get('island') ?? "All"
-  const filteredPlace = island == "All" ? places : places.filter(p => p.island?.toLowerCase() == island.toLowerCase() )
-  const result = useMemo(() => searchFor(places, searchValue).slice(0, 10).sort((a, b) => (a?.name ?? "").localeCompare((b?.name ?? "")) ), [places, searchValue])
-
-  useEffect(() => {
-    setCurrentPagePlace(result)
-  }, [result])
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
+  const island = searchParams.get('island') ?? "All"
+  const matches = useMemo(() => matching(places, searchValue), [places, searchValue])
+  // Worked out from the list and the URL on every render, so an edit, an add
+  // or a delete can't leave the page number and the rows out of step.
+  const totalPage = Math.max(1, Math.ceil(matches.length / PAGE_SIZE))
+  // Clamped, so ?page=99, or a last page emptied by a delete, shows the last real page.
+  const page = Math.min(Math.max(Number(searchParams.get('page')) || 1, 1), totalPage)
+  const currentPagePlace = matches.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   useEffect(() => {
     fetchPlaces()
   }, [])
 
+  // Pushes by default, so Back steps through the pages turned.
+  function goToPage(nextPage: number, replace = false) {
+    setSearchParams((params) => {
+      params.set('page', String(nextPage))
+      return params
+    }, { replace })
+  }
+
   function filterIsland(island: string) {
-    setIslandParams((params) => {
-      params.set('island', island) 
+    // One update for both keys: two in the same tick would each start from the
+    // same params, and the second would undo the first.
+    setSearchParams((params) => {
+      params.set('island', island)
+      params.set('page', '1')
       return params
     })
     setSearchValue(island === "All" ? "" : trimString(island))
-
   }
 
   function movePage(action: PageActions) {
-    let nextPage = page
-    if(action === 'right' && page != totalPage) nextPage = page + 1
-    if(action === 'left' && page != 1) nextPage = page - 1
+    const nextPage = action === 'right' ? page + 1 : page - 1
+    if (nextPage < 1 || nextPage > totalPage) return
+    goToPage(nextPage)
+  }
 
-    setPage(nextPage)
-    const paginated = places.slice((nextPage - 1) * 10, nextPage * 10)
-    setCurrentPagePlace(paginated)
+  // Turn to the page the place ended up on so its highlight is in view: a new
+  // place sorts in by name, and a rename can move one to another page.
+  function showPlace(list: PlaceItem[], id: number) {
+    const index = matching(list, searchValue).findIndex(p => p.id === id)
+    const placePage = Math.floor(index / PAGE_SIZE) + 1
+    if (index !== -1 && placePage !== page) goToPage(placePage)
+    setHighlightedPlaceId(id)
   }
 
   function onSavedPlace(savedPlace: PlaceItem) {
-    setPlaces((prev) => prev.map(p => p.id === savedPlace.id ? savedPlace : p ))
+    const next = places.map(p => p.id === savedPlace.id ? savedPlace : p)
+    setPlaces(next)
+    showPlace(next, savedPlace.id)
   }
 
   function onCreatedPlace(savedPlace: PlaceItem) {
-    setPlaces((prev) => [...prev, savedPlace])
+    const next = [...places, savedPlace]
+    setPlaces(next)
+    showPlace(next, savedPlace.id)
   }
-
 
   function triggerSearch(e: React.ChangeEvent<HTMLInputElement>) {
     setSearchValue(e.target.value)
+    // Replace, or every keystroke would be a history entry.
+    if (page !== 1) goToPage(1, true)
   }
 
   async function onDelete (place: PlaceItem) {
+     if(place.original) return
     const response = await fetch(`${API}/${place.id}`, {
       method: 'DELETE',
       credentials: "include",
@@ -91,8 +119,6 @@ export default function Places() {
       })
       const data = await response.json()
       setPlaces(data.places ?? [])
-      data.places?.length > 1 && setTotalPage(Math.ceil(data.places.length / 10))
-      setCurrentPagePlace(data.places.slice(0, 10))
     } catch (e) {
         console.log(e)
     } finally {
@@ -148,10 +174,10 @@ export default function Places() {
           <tbody>
             {currentPagePlace.length
               ? <>
-                  {currentPagePlace.map((place) => <Place onDelete={onDelete} onEdit={() => setEditingPlace(place)} key={place.id} place={place} />)}
+                  {currentPagePlace.map((place) => <Place highlightedPlaceId={highlightedPlaceId} onDelete={onDelete} onEdit={() => setEditingPlace(place)} key={place.id} place={place} />)}
                   {/* Blank rows the height of a real one, so a short last
                       page keeps the table the size of a full page. */}
-                  {Array.from({ length: 10 - currentPagePlace.length }, (_, i) => (
+                  {Array.from({ length: PAGE_SIZE - currentPagePlace.length }, (_, i) => (
                     <tr key={`filler-${i}`} aria-hidden="true" className="border-t border-divider">
                       <td className="px-4 py-3">
                         <div className="invisible font-semibold">&nbsp;</div>
@@ -176,12 +202,13 @@ export default function Places() {
       {/* Pagination */}
       <div className="flex items-center justify-between gap-4 border-t border-divider px-4 py-3">
         <Muted as="span" className="text-sm">
-          Showing <span className="font-semibold text-ink">{`${((page - 1) * 10) + 1} - ${ page * 10 }`}</span> of{" "}
-          <span className="font-semibold text-ink">{ places.length}</span>
+          Showing <span className="font-semibold text-ink">{matches.length ? `${(page - 1) * PAGE_SIZE + 1} - ${(page - 1) * PAGE_SIZE + currentPagePlace.length}` : "0"}</span> of{" "}
+          <span className="font-semibold text-ink">{matches.length}</span>
         </Muted>
         <div className="flex items-center gap-1">
           <button
             onClick={() => movePage("left")}
+            disabled={page === 1}
             type="button"
             aria-label="Previous page"
             className={`${page == 1 ? "text-gray-300" : "text-venice"} rounded-pill p-2 transition-colors hover:bg-venice-pale disabled:pointer-events-none disabled:opacity-40`}
@@ -191,6 +218,7 @@ export default function Places() {
           <span className="px-2 font-mono text-xs text-ink-soft">{page} / {totalPage}</span>
           <button
             onClick={() => movePage("right")}
+            disabled={page === totalPage}
             type="button"
             aria-label="Next page"
             className={`${page == totalPage ? "text-gray-300" : "text-venice"}  rounded-pill p-2  transition-colors hover:bg-venice-pale disabled:pointer-events-none disabled:opacity-40`}
@@ -206,7 +234,7 @@ export default function Places() {
         <div className="p-6 pt-12 md:p-8">
           <Label>Edit place</Label>
           <Display as="h2" size="md" className="mt-2">{editingPlace.name}</Display>
-          <EditForm onSavedPlace={onSavedPlace} place={editingPlace} />
+          <EditForm selectedFiles={selectedFiles} onSavedPlace={onSavedPlace} place={editingPlace} />
         </div>
       </Modal>
     )}
@@ -214,7 +242,7 @@ export default function Places() {
         <Modal closePlaceModal={() => setAddPlaceModalContent(false)}>
         <div className="p-6 pt-12 md:p-8">
           <Display as="h2" size="md" className="mt-2">Add Place</Display>
-          <AddForm onCreatedPlace={ onCreatedPlace} />
+          <AddForm selectedFiles={selectedFiles} setSelectedFiles={setSelectedFiles} onCreatedPlace={ onCreatedPlace} />
         </div>
       </Modal>
     )}

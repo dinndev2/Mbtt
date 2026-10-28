@@ -16,9 +16,25 @@ class Image < ApplicationRecord
   validates :license, presence: true
   validates :seq, numericality: { greater_than: 0 }
 
+  # Photos uploaded from the admin form, as opposed to the bundled files above.
+  # Nobody has granted a licence for them yet, so they start "unverified" like
+  # the open-web set; `local_path` keeps the original filename for the record.
+  has_one_attached :image
+  before_validation :fill_upload_defaults, on: :create, if: -> { image.attached? }
   default_scope { order(:seq) }
+
+  def uploaded?
+    image.attached?
+  end
 
   def credit
     [ attribution, license ].compact_blank.join(" / ")
+  end
+
+  private
+
+  def fill_upload_defaults
+    self.license ||= "unverified"
+    self.local_path ||= image.filename.to_s
   end
 end

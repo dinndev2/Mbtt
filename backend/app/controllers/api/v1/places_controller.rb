@@ -11,6 +11,8 @@ class Api::V1::PlacesController < ApplicationsController
   def create
     place = Place.new
     place.assign_attributes(place_params)
+    
+    
     if place.save
       render json: {
         place: PlaceSerializer.one(place)
@@ -24,7 +26,6 @@ class Api::V1::PlacesController < ApplicationsController
 
   def update
     place = Place.find(params[:id])
-  
     if place
       place.assign_attributes(place_params)
       if place.save
@@ -41,6 +42,7 @@ class Api::V1::PlacesController < ApplicationsController
  
   def destroy
     place = Place.find(params[:id])
+    return if place.original
     place.destroy!
     head :no_content
   end
@@ -54,6 +56,6 @@ class Api::V1::PlacesController < ApplicationsController
   end
 
   def place_params
-    params.expect(place: [:name, :description, :id, :images, :access_notes, :fare_estimates, :latitude, :longitude, :municipality, :island, :travel_time_note, :source, :access_note])
+    params.expect(place: [:name, :description, :id, :images, :access_notes, :fare_estimates, :latitude, :longitude, :municipality, :island, :travel_time_note, :source, :access_note, images_attributes: [[:id, :image, :_destroy]]])
   end
 end 

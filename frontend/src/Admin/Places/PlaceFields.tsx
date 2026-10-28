@@ -1,6 +1,8 @@
-import { type PlaceItem } from "../../App"
+import { type ImageItem, type PlaceItem } from "../../App"
 import { type ReactNode } from "react"
 import { Divider, Input, Label } from "../../ui"
+import { Trash2 } from "lucide-react"
+import { useState, useEffect } from "react"
 
 const ISLANDS = ["Masbate", "Ticao", "Burias"]
 const COORD_STATUSES = [
@@ -32,12 +34,30 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
   )
 }
 
-export default function PlaceFields({ place }: { place?: PlaceItem | null }) {
+export default function PlaceFields({ place, handleSelectedMultipleFiles, handleDeleteMultipleFiles }: { place?: PlaceItem | null, handleSelectedMultipleFiles?: (e: React.ChangeEvent<HTMLInputElement>) => void, handleDeleteMultipleFiles?: (id: number) => void }) {
+  
   return <>
     <Section title="Basics">
       <Field label="Name">
         <Input type="text" name="name" defaultValue={place?.name ?? ""} required />
       </Field>
+      <input
+        type="file"
+        multiple={true}
+        onChange={handleSelectedMultipleFiles}
+        accept="image/*"
+      />
+      {place && <div className="w-full overflow-x-scroll"> 
+        <ul className="flex w-full lg:overflow-x-scroll snap-x snap-mandatory scrollbar-none rounded md:rounded-2xl">
+          {place.images.map(({url, id}) => {
+            return <div key={id} className="w-96 max-h-68 relative">
+              <span onClick={(e) => handleDeleteMultipleFiles && handleDeleteMultipleFiles(id)} className="absolute cursor-pointer hover:opacity-90 top-2 left-3 rounded-full p-2 font-display text-venice bg-white border border-venice"><Trash2 className="h-3 w-3"/></span>
+              <img className="object-cover md:p-1 max-h-68 snap-center md:rounded-2xl w-full shrink-0" key={url} src={url} alt={place.name} />
+              </div>
+          })}
+        </ul>
+      </div>}
+        
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Island">
           <select name="island" defaultValue={place?.island ?? ""} className={control}>
@@ -99,5 +119,6 @@ export default function PlaceFields({ place }: { place?: PlaceItem | null }) {
         </Field>
       </div>
     </Section>
+    
   </>
 }

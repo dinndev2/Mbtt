@@ -69,6 +69,7 @@ export type StopItem = {
 /** A photo of a place or a stop. Both come from the one images table. */
 export type ImageItem = {
   url: string
+  id: number
   license: string
   attribution: string | null
   source_page: string | null
@@ -290,6 +291,7 @@ export type Prominence = {
 export type PlaceItem = {
   id: number
   external_id: string
+  original: boolean
   name: string | undefined
   description: string | null
   latitude: number
