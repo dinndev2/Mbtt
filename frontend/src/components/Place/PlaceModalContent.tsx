@@ -74,7 +74,9 @@ export default function PlaceModalContent({currentSelectedPlace}: { currentSelec
           ? <TerminalPage stop={stop} backLabel={currentSelectedPlace.name ?? 'place'} onBack={back} />
           : <>
             <ImageSlider place={currentSelectedPlace} />
-            <div className='rounded-t-card px-5 pt-5 -translate-y-7 md:translate-y-0 bg-surface'>
+            {/* Only lifted over a photo; with none it would tuck the chips
+                under the top of the sheet. */}
+            <div className={`rounded-t-card px-5 md:pt-5 md:translate-y-0 bg-surface ${currentSelectedPlace.images.length ? 'pt-5 -translate-y-7' : 'pt-12'}`}>
               <span className="flex flex-wrap gap-2">
                 <Chip className='inline'>{municipality}</Chip>
                 <Chip active className='inline'>{currentSelectedPlace.island} Island</Chip>

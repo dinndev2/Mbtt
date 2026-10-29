@@ -12,7 +12,10 @@ export default function Map ({ currentSelectedPlace}: {currentSelectedPlace: Pla
     center={[latitude, longitude]}
     zoom={13}
     scrollWheelZoom={false}
-    className="h-[500px] w-full rounded-xl border-2"
+    // isolate keeps Leaflet's panes and controls (z-index 400-1000) inside
+    // the map, so they scroll under the fare bar and close button instead of
+    // over them.
+    className="isolate h-[500px] w-full rounded-xl border-2"
   
   
   >

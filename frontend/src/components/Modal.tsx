@@ -23,6 +23,10 @@ export default function Modal({
   const startY = useRef(0)
   const currentY = useRef(0)
   const startTime = useRef(0)
+  // The pointer that started on the handle. Without it a mouse hovering the
+  // strip moves the sheet, and a press that began in the content and was let
+  // go over the strip reads as a swipe from y=0 and closes it.
+  const dragPointer = useRef<number | null>(null)
 
   const [isClosing, setIsClosing] = useState(false)
 
@@ -40,6 +44,9 @@ export default function Modal({
   }
 
   const down = (e: React.PointerEvent) => {
+    if (!e.isPrimary || e.button !== 0) return
+
+    dragPointer.current = e.pointerId
     startY.current = e.clientY
     currentY.current = e.clientY
     startTime.current = e.timeStamp
@@ -52,6 +59,8 @@ export default function Modal({
   }
 
   const move = (e: React.PointerEvent) => {
+    if (e.pointerId !== dragPointer.current) return
+
     currentY.current = e.clientY
 
     const deltaY = currentY.current - startY.current
@@ -62,12 +71,21 @@ export default function Modal({
   }
 
   const up = (e: React.PointerEvent) => {
-    currentY.current = e.clientY
+    if (e.pointerId !== dragPointer.current) return
+    dragPointer.current = null
+
+    // A cancel is the browser taking the gesture back, and its coordinates
+    // can be zeroed, so it only ever snaps the sheet back.
+    currentY.current = e.type === 'pointercancel' ? startY.current : e.clientY
 
     const deltaY = currentY.current - startY.current
     const elapsed = Math.max(e.timeStamp - startTime.current, 1)
     // A quick flick should dismiss even if it didn't travel far.
     const isFlick = deltaY > 30 && deltaY / elapsed > 0.5
+
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId)
+    }
 
     if (!contentRef.current) return
 
@@ -85,8 +103,6 @@ export default function Modal({
         'transform 200ms ease-out'
       contentRef.current.style.transform = 'translateY(0)'
     }
-
-    e.currentTarget.releasePointerCapture(e.pointerId)
   }
 
   const unmountWhenExitDone = (
