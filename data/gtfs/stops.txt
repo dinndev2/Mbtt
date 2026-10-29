@@ -1,33 +1,35 @@
-stop_id,stop_code,stop_name,stop_desc,stop_lat,stop_lon,zone_id,location_type,parent_station,wheelchair_boarding,mbtt_coord_precision
-S_MASBATE_PORT,,Masbate City Port,Main pier. Fastcraft and RoRo to Ticao and Sorsogon,12.371090,123.623922,Z_CITY,0,,0,town_centroid
-S_MASBATE_FISHPORT,,Masbate Fish Port,Van terminal for Mandaon and the west,12.371090,123.623922,Z_CITY,0,,0,town_centroid
-S_MASBATE_TERMINAL,,Masbate City Integrated Terminal,Bus and UV Express for mainland towns,12.371090,123.623922,Z_CITY,0,,0,town_centroid
-S_RENDEZVOUS_BEACH,,Rendezvous Beach Resort,Jump-off for Buntod sandbar boats,12.371090,123.623922,Z_CITY,0,,0,town_centroid
-S_BUNTOD_SANDBAR,,Buntod Sandbar,Marine sanctuary landing,12.371090,123.623922,Z_CITY,0,,0,estimated
-S_PAWA_JO,,Pawa Mangrove Park jump-off,NE Delos Santos Elementary School arch,12.371090,123.623922,Z_CITY,0,,0,estimated
-S_MOBO_PORT,,Mobo Port,RoRo to Claveria on Burias,12.336610,123.658077,Z_MOBO,0,,0,town_centroid
-S_MOBO_POB,,Mobo Poblacion,,12.336610,123.658077,Z_MOBO,0,,0,town_centroid
-S_LAGUNDI_PORT,,Lagundi Port,Ticao arrival pier for Monreal,12.644142,123.663779,Z_TICAO,0,,0,estimated
-S_MONREAL_POB,,Monreal Poblacion,Jump-off for Halea and island hopping,12.644142,123.663779,Z_TICAO,0,,0,town_centroid
-S_MATANGTUBIG_JO,,Matang Tubig jump-off,,12.644142,123.663779,Z_TICAO,0,,0,estimated
-S_SANJACINTO_PORT,,San Jacinto Port,Ticao. Ferries from Bulan Sorsogon,12.567700,123.733700,Z_TICAO,0,,0,town_centroid
-S_BATUAN_POB,,Batuan Poblacion,Ticao. Nearest town to Bongsanglay,12.421628,123.779537,Z_TICAO,0,,0,town_centroid
-S_SANFERNANDO_POB,,San Fernando Poblacion,Ticao Island,12.567700,123.733700,Z_TICAO,0,,0,estimated
-S_CLAVERIA_PORT,,Claveria Port,Burias Island. RoRo from Mobo and Pio Duran,12.903479,123.245712,Z_BURIAS,0,,0,town_centroid
-S_SANPASCUAL_POB,,San Pascual Poblacion,Burias. Tourism office books the island-hopping boats,13.128122,122.977570,Z_BURIAS,0,,0,town_centroid
-S_SANPASCUAL_PORT,,San Pascual Port,Burias. Ferries from Pasacao Camarines Sur,13.128122,122.977570,Z_BURIAS,0,,0,town_centroid
-S_MANDAON_POB,,Mandaon Poblacion,Jump-off for Bat-ongan Cave,12.226646,123.284913,Z_MANDAON,0,,0,town_centroid
-S_BATONGAN_JO,,Bat-ongan jump-off,1.5 km off the national highway,12.226646,123.284913,Z_MANDAON,0,,0,estimated
-S_BALUD_POB,,Balud Poblacion,Nearest town to Palani Beach,12.038435,123.193368,Z_BALUD,0,,0,town_centroid
-S_AROROY_POB,,Aroroy Poblacion,Lighthouse and fish port,12.512334,123.398692,Z_AROROY,0,,0,town_centroid
-S_BALENO_POB,,Baleno Poblacion,Nearest town to Busay de Gracia Falls,12.473876,123.497522,Z_BALENO,0,,0,town_centroid
-S_CATAINGAN_POB,,Cataingan Poblacion,Matayum Lagoon,11.999647,123.997846,Z_CATAINGAN,0,,0,town_centroid
-S_ESPERANZA_POB,,Esperanza Poblacion,Jump-off for La Manok Island and Gawas Beach,11.736962,124.041699,Z_ESPERANZA,0,,0,town_centroid
-S_PLACER_POB,,Placer Poblacion,Bangka to Nagarao Island leaves from Pasiagon,11.870290,123.918225,Z_PLACER,0,,0,town_centroid
-S_DIMASALANG_POB,,Dimasalang Poblacion,Town jetty for Porta Vega,12.193138,123.858602,Z_DIMASALANG,0,,0,town_centroid
-S_NAGARAO_ISLAND,,Nagarao Island,,11.870290,123.918225,Z_PLACER,0,,0,estimated
-S_PORTAVEGA,,Porta Vega Beach,,12.193138,123.858602,Z_DIMASALANG,0,,0,estimated
-S_PILAR_PORT,,Pilar Port,Sorsogon. Mainland Bicol gateway,12.923572,123.675399,Z_OFFISLAND,0,,0,town_centroid
-S_BULAN_PORT,,Bulan Port,Sorsogon. Ferries to San Jacinto Ticao,12.668908,123.876959,Z_OFFISLAND,0,,0,town_centroid
-S_PIODURAN_PORT,,Pio Duran Port,Albay. Ferries to Claveria Burias,13.029699,123.443142,Z_OFFISLAND,0,,0,town_centroid
-S_PASACAO_PORT,,Pasacao Port,Camarines Sur. The usual gateway to Burias,13.510207,123.041150,Z_OFFISLAND,0,,0,town_centroid
+stop_id,stop_code,stop_name,stop_desc,stop_lat,stop_lon,zone_id,location_type,parent_station,wheelchair_boarding,mbtt_coord_precision,mbtt_island
+S_MASBATE_PORT,,Masbate City Port,Main pier. Fastcraft and RoRo to Ticao and Sorsogon,12.371090,123.623922,Z_CITY,0,,0,town_centroid,Masbate
+S_MASBATE_FISHPORT,,Masbate Fish Port,Van terminal for Mandaon and the west,12.371090,123.623922,Z_CITY,0,,0,town_centroid,Masbate
+S_MASBATE_TERMINAL,,Masbate City Integrated Terminal,Bus and UV Express for mainland towns,12.371090,123.623922,Z_CITY,0,,0,town_centroid,Masbate
+S_RENDEZVOUS_BEACH,,Rendezvous Beach Resort,Jump-off for Buntod sandbar boats,12.371090,123.623922,Z_CITY,0,,0,town_centroid,Masbate
+S_BUNTOD_SANDBAR,,Buntod Sandbar,Marine sanctuary landing,12.371090,123.623922,Z_CITY,0,,0,estimated,Masbate
+S_PAWA_JO,,Pawa Mangrove Park jump-off,NE Delos Santos Elementary School arch,12.371090,123.623922,Z_CITY,0,,0,estimated,Masbate
+S_MOBO_PORT,,Mobo Port,RoRo to Claveria on Burias,12.336610,123.658077,Z_MOBO,0,,0,town_centroid,Masbate
+S_MOBO_POB,,Mobo Poblacion,,12.336610,123.658077,Z_MOBO,0,,0,town_centroid,Masbate
+S_LAGUNDI_PORT,,Lagundi Port,Ticao arrival pier for Monreal,12.644142,123.663779,Z_TICAO,0,,0,estimated,Ticao
+S_MONREAL_POB,,Monreal Poblacion,Jump-off for Halea and island hopping,12.644142,123.663779,Z_TICAO,0,,0,town_centroid,Ticao
+S_MATANGTUBIG_JO,,Matang Tubig jump-off,,12.644142,123.663779,Z_TICAO,0,,0,estimated,Ticao
+S_SANJACINTO_PORT,,San Jacinto Port,Ticao. Ferries from Bulan Sorsogon,12.567700,123.733700,Z_TICAO,0,,0,town_centroid,Ticao
+S_BATUAN_POB,,Batuan Poblacion,Ticao. Nearest town to Bongsanglay,12.421628,123.779537,Z_TICAO,0,,0,town_centroid,Ticao
+S_SANFERNANDO_POB,,San Fernando Poblacion,Ticao Island,12.567700,123.733700,Z_TICAO,0,,0,estimated,Ticao
+S_CLAVERIA_PORT,,Claveria Port,Burias Island. RoRo from Mobo and Pio Duran,12.903479,123.245712,Z_BURIAS,0,,0,town_centroid,Burias
+S_SANPASCUAL_POB,,San Pascual Poblacion,Burias. Tourism office books the island-hopping boats,13.128122,122.977570,Z_BURIAS,0,,0,town_centroid,Burias
+S_SANPASCUAL_PORT,,San Pascual Port,Burias. Ferries from Pasacao Camarines Sur,13.128122,122.977570,Z_BURIAS,0,,0,town_centroid,Burias
+S_MANDAON_POB,,Mandaon Poblacion,Jump-off for Bat-ongan Cave,12.226646,123.284913,Z_MANDAON,0,,0,town_centroid,Masbate
+S_BATONGAN_JO,,Bat-ongan jump-off,1.5 km off the national highway,12.226646,123.284913,Z_MANDAON,0,,0,estimated,Masbate
+S_BALUD_POB,,Balud Poblacion,Nearest town to Palani Beach,12.038435,123.193368,Z_BALUD,0,,0,town_centroid,Masbate
+S_AROROY_POB,,Aroroy Poblacion,Lighthouse and fish port,12.512334,123.398692,Z_AROROY,0,,0,town_centroid,Masbate
+S_BALENO_POB,,Baleno Poblacion,Nearest town to Busay de Gracia Falls,12.473876,123.497522,Z_BALENO,0,,0,town_centroid,Masbate
+S_CATAINGAN_POB,,Cataingan Poblacion,Matayum Lagoon,11.999647,123.997846,Z_CATAINGAN,0,,0,town_centroid,Masbate
+S_ESPERANZA_POB,,Esperanza Poblacion,Jump-off for La Manok Island and Gawas Beach,11.736962,124.041699,Z_ESPERANZA,0,,0,town_centroid,Masbate
+S_PLACER_POB,,Placer Poblacion,Bangka to Nagarao Island leaves from Pasiagon,11.870290,123.918225,Z_PLACER,0,,0,town_centroid,Masbate
+S_DIMASALANG_POB,,Dimasalang Poblacion,Town jetty for Porta Vega,12.193138,123.858602,Z_DIMASALANG,0,,0,town_centroid,Masbate
+S_NAGARAO_ISLAND,,Nagarao Island,,11.870290,123.918225,Z_PLACER,0,,0,estimated,Masbate
+S_PORTAVEGA,,Porta Vega Beach,,12.193138,123.858602,Z_DIMASALANG,0,,0,estimated,Masbate
+S_PILAR_PORT,,Pilar Port,Sorsogon. Mainland Bicol gateway,12.923572,123.675399,Z_PILAR,0,,0,town_centroid,Luzon
+S_BULAN_PORT,,Bulan Port,Sorsogon. Ferries to San Jacinto Ticao,12.668908,123.876959,Z_BULAN,0,,0,town_centroid,Luzon
+S_PIODURAN_PORT,,Pio Duran Port,Albay. Ferries to Claveria Burias,13.029699,123.443142,Z_PIODURAN,0,,0,town_centroid,Luzon
+S_PASACAO_PORT,,Pasacao Port,Camarines Sur. The usual gateway to Burias,13.510207,123.041150,Z_PASACAO,0,,0,town_centroid,Luzon
+S_SANANDRES_PORT,,San Andres Port,Quezon. RoRo to San Pascual on Burias,13.478300,122.677200,Z_SANANDRES,0,,0,town_centroid,Luzon
+S_BUGUI_LANDING,,Sitio Bajo (Bugui Point),"Boat landing for Bugui Point Lighthouse, northern tip of Masbate island",12.600150,123.237980,Z_AROROY,0,,0,estimated,Masbate

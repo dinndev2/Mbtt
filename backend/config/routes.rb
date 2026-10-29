@@ -8,9 +8,18 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :bundles, only: [:show, :index]
+      resources :sessions, only: [:create] do
+        collection do
+          get :show
+          delete :destroy
+        end
+      end
+      resources :places
     end
   end
 
+  
+  
   # Defines the root path route ("/")
   # root "posts#index"
 end

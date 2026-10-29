@@ -4,6 +4,7 @@ class PlaceSerializer < ApplicationSerializer
       id: record.id,
       external_id: record.external_id,
       name: record.name,
+      original: record.original,
       description: record.description,
       # Decimals would otherwise serialize as strings; the map wants numbers.
       latitude: record.latitude&.to_f,
@@ -30,15 +31,22 @@ class PlaceSerializer < ApplicationSerializer
       categories: CategorySerializer.many(record.categories),
       vihicles: VihicleSerializer.many(record.vihicles),
       stop: StopSerializer.one(record.stop),
-      images: PlaceImageSerializer.many(record.place_images),
-      fare_estimates: FareEstimateSerializer.many(estimates),
-      on_island: Place.on_island(record.island)
+      images: ImageSerializer.many(record.images),
+      fare_estimates: FareEstimateSerializer.many(estimates, **context)
     }
   end
 
   private
 
+
+  # `from_island` is what makes an estimate mean anything to the person
+  # holding the phone: it decides both which legs they still have to make and
+  # which crossing they are shown. See FareEstimate#join_where_traveller_is.
   def estimates
-    FareEstimate.for_place(record, pax: context.fetch(:pax, 1))
+    FareEstimate.for_place(
+      record,
+      pax: context.fetch(:pax, 1),
+      from_island: context[:from_island]
+    )
   end
 end

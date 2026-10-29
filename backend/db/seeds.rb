@@ -40,6 +40,66 @@ end
   end
 end
 
+DATA = Rails.root.parent.join("data")
+
+def csv_rows(path)
+  path.exist? ? CSV.read(path, headers: true) : (Rails.logger.warn("missing #{path}"); [])
+end
+
+# Stops, from the GTFS feed. These are the network's nouns, so they load before
+# anything that points at one -- the sample trip below included. Coordinates are
+# mostly municipality centroids; mbtt_coord_precision records which, so the app
+# can flag an approximate pin.
+#
+# GTFS location_type 0 is a platform you board at, 1 a station that contains
+# them; the feed has no stations yet, but reading the column means the day one
+# appears the seed does not quietly flatten it.
+GTFS_LOCATION_TYPES = { "1" => :station }.freeze
+GTFS_WHEELCHAIR     = { "1" => :accessible, "2" => :not_accessible }.freeze
+
+csv_rows(DATA.join("gtfs", "stops.txt")).each do |row|
+  stop = Stop.find_or_initialize_by(gtfs_id: row["stop_id"])
+  stop.assign_attributes(
+    name:                row["stop_name"],
+    code:                row["stop_code"].presence,
+    description:         row["stop_desc"].presence,
+    latitude:            row["stop_lat"].presence,
+    longitude:           row["stop_lon"].presence,
+    zone_id:             row["zone_id"].presence,
+    # Which island the stop is on, from the feed's mbtt_island extension. This
+    # is what lets IslandConnection notice that a traveller is somewhere other
+    # than where an access chain silently assumes they are standing.
+    island:              row["mbtt_island"].presence,
+    location_type:       GTFS_LOCATION_TYPES.fetch(row["location_type"], :boarding),
+    wheelchair_boarding: GTFS_WHEELCHAIR.fetch(row["wheelchair_boarding"], :unknown)
+  )
+  stop.save!
+end
+
+# Terminal detail, from data/stops.csv rather than the feed. GTFS has nowhere
+# to record that Aroroy is not a RoRo port or that San Jacinto is daytime
+# navigation only, and both change whether a crossing is possible. Thirteen
+# stops carry nothing but a role; those columns stay null on purpose.
+csv_rows(DATA.join("stops.csv")).each do |row|
+  stop = Stop.find_by(gtfs_id: row["stop_id"])
+  next Rails.logger.warn("stops.csv references unknown stop #{row["stop_id"]}") unless stop
+
+  stop.update!(
+    role:              row["role"].presence,
+    port_authority:    row["port_authority"].presence,
+    navigation:        row["navigation"].presence,
+    serves:            row["serves"].presence,
+    operators:         row["operators"].presence,
+    facilities:        row["facilities"].presence,
+    ticketing:         row["ticketing"].presence,
+    arrive_before_min: row["arrive_before_min"].presence,
+    notes:             row["notes"].presence,
+    detail_confidence: row["confidence"].presence,
+    detail_as_of:      row["valid_as_of"].presence,
+    detail_source:     row["source_url"].presence
+  )
+end
+
 # ---------------------------------------------------------------------------
 # Sample network: Masbate City to Mobo by mini jeep
 # ---------------------------------------------------------------------------
@@ -56,34 +116,11 @@ agency = Agency.find_or_create_by!(gtfs_id: "AG_MBTT") do |a|
   a.phone = "+63 56 000 0000"
 end
 
-# The city terminal is a station; the bay inside it is where you actually board.
-terminal = Stop.find_or_create_by!(gtfs_id: "S_MASBATE_TERMINAL") do |s|
-  s.name          = "Masbate City Integrated Terminal"
-  s.description   = "Main terminal building"
-  s.latitude      = 12.370500
-  s.longitude     = 123.622800
-  s.zone_id       = "Z_CITY"
-  s.location_type = :station
-end
-
-city_bay = Stop.find_or_create_by!(gtfs_id: "S_MASBATE_BAY_MOBO") do |s|
-  s.name          = "Mobo bay, Masbate terminal"
-  s.description   = "Jeep loading bay on the market side"
-  s.latitude      = 12.370200
-  s.longitude     = 123.623100
-  s.zone_id       = "Z_CITY"
-  s.location_type = :boarding
-  s.parent_stop   = terminal
-end
-
-mobo = Stop.find_or_create_by!(gtfs_id: "S_MOBO_POBLACION") do |s|
-  s.name          = "Mobo Poblacion"
-  s.description   = "Roadside stop across the municipal hall"
-  s.latitude      = 12.322000
-  s.longitude     = 123.616000
-  s.zone_id       = "Z_MOBO"
-  s.location_type = :boarding
-end
+# Both ends of the trip are real stops from data/gtfs/stops.txt, loaded above --
+# the route is the illustration here, not the geography. Fail loudly if the feed
+# stopped carrying them rather than seeding a lookalike under a new id.
+terminal = Stop.find_by!(gtfs_id: "S_MASBATE_TERMINAL")
+mobo     = Stop.find_by!(gtfs_id: "S_MOBO_POB")
 
 route = Route.find_or_create_by!(gtfs_id: "R_JEEP_MASBATE_MOBO") do |r|
   r.agency      = agency
@@ -116,16 +153,18 @@ end
 # Two stops is the minimum a trip can have. timepoint is true only where the
 # time is actually dependable -- here, the terminal's first run of the day.
 [
-  { stop: city_bay, stop_sequence: 10, time: "06:00:00", timepoint: true,  km: 0.0 },
+  { stop: terminal, stop_sequence: 10, time: "06:00:00", timepoint: true,  km: 0.0 },
   { stop: mobo,     stop_sequence: 20, time: "06:25:00", timepoint: false, km: 9.4 }
 ].each do |attributes|
-  StopTime.find_or_create_by!(trip: trip, stop_sequence: attributes[:stop_sequence]) do |st|
-    st.stop                = attributes[:stop]
-    st.arrival_time        = attributes[:time]
-    st.departure_time      = attributes[:time]
-    st.timepoint           = attributes[:timepoint]
-    st.shape_dist_traveled = attributes[:km]
-  end
+  stop_time = StopTime.find_or_initialize_by(trip: trip, stop_sequence: attributes[:stop_sequence])
+  stop_time.assign_attributes(
+    stop:                attributes[:stop],
+    arrival_time:        attributes[:time],
+    departure_time:      attributes[:time],
+    timepoint:           attributes[:timepoint],
+    shape_dist_traveled: attributes[:km]
+  )
+  stop_time.save!
 end
 
 # The jeep leaves when full, so the schedule is a wait, not a departure list.
@@ -159,27 +198,6 @@ FareRule.find_or_create_by!(fare: fare, route: route)
 # edit them and re-run, don't add rows here. Every import matches on the
 # natural key so re-running upserts instead of duplicating.
 
-DATA = Rails.root.parent.join("data")
-
-def csv_rows(path)
-  path.exist? ? CSV.read(path, headers: true) : (Rails.logger.warn("missing #{path}"); [])
-end
-
-# Stops, from the GTFS feed. Coordinates are mostly municipality centroids --
-# mbtt_coord_precision records which, so the app can flag an approximate pin.
-csv_rows(DATA.join("gtfs", "stops.txt")).each do |row|
-  stop = Stop.find_or_initialize_by(gtfs_id: row["stop_id"])
-  stop.assign_attributes(
-    name:          row["stop_name"],
-    description:   row["stop_desc"].presence,
-    latitude:      row["stop_lat"].presence,
-    longitude:     row["stop_lon"].presence,
-    zone_id:       row["zone_id"].presence,
-    location_type: :boarding
-  )
-  stop.save!
-end
-
 MODE_TO_VIHICLE_SLUG = {
   "ferry" => "ferry", "boat" => "boat", "motorcycle" => "motorcycle",
   "jeep" => "mini-jeep", "van" => "van", "bus" => "bus", "tricycle" => "tricycle"
@@ -201,9 +219,53 @@ csv_rows(DATA.join("fare_legs.csv")).each do |row|
     confidence:     row["confidence"],
     valid_as_of:    row["valid_as_of"].presence,
     source_url:     row["source_url"].presence,
-    notes:          row["notes"].presence
+    notes:          row["notes"].presence,
+    # The timetable, taken from the research CSV rather than from the GTFS
+    # feed on purpose: README's verify list has the feed contradicted in both
+    # directions on R_RORO_MSB_PILAR and running three hours late on
+    # R_PUMP_MSB_LAGUNDI. `departures_back` in particular is the return
+    # direction the feed does not carry at all on the main gateway route.
+    schedule_kind:   row["schedule_kind"].presence || "unknown",
+    departures_out:  row["departures_out"].presence,
+    departures_back: row["departures_back"].presence,
+    service_start:   row["service_start"].presence,
+    service_end:     row["service_end"].presence,
+    headway_min:     row["headway_min"].presence,
+    service_days:    row["service_days"].presence,
+    # How far to trust the timetable above. Lives on the leg, not the route:
+    # fare_legs.csv is the corrected source and routes.txt still carries the
+    # figures it corrected.
+    schedule_confidence: row["schedule_confidence"].presence || "unknown",
+    schedule_as_of:      row["schedule_as_of"].presence,
+    schedule_source:     row["schedule_source"].presence,
+    schedule_note:       row["schedule_note"].presence
   )
   leg.save!
+end
+
+# Last trips, from data/last_trips.csv. The figure that decides whether a place
+# is a day trip, and the one a timetable cannot be trusted to imply -- see the
+# CreateLastTrips migration. Four rows today; the rest of the network either
+# derives one from a real timetable or honestly reports that nobody knows.
+csv_rows(DATA.join("last_trips.csv")).each do |row|
+  leg  = FareLeg.find_by(external_id: row["leg_id"])
+  stop = Stop.find_by(gtfs_id: row["board_stop_id"])
+  unless leg && stop
+    Rails.logger.warn("last_trips.csv row references unknown leg or stop: #{row["leg_id"]} / #{row["board_stop_id"]}")
+    next
+  end
+
+  # Not `trip` -- the sample network below binds that name to a Trip record.
+  last_trip = LastTrip.find_or_initialize_by(fare_leg: leg, board_stop: stop)
+  last_trip.assign_attributes(
+    last_departure: row["last_departure"],
+    overnight:      row["overnight"].to_s == "1",
+    confidence:     row["confidence"].presence || "unknown",
+    valid_as_of:    row["valid_as_of"].presence,
+    source_url:     row["source_url"].presence,
+    notes:          row["notes"].presence
+  )
+  last_trip.save!
 end
 
 # Operators, from the GTFS feed. Where a mode has no formal operator -- habal
@@ -323,21 +385,33 @@ csv_rows(DATA.join("place_fees.csv")).each do |row|
   fee.save!
 end
 
-# Images bundled under frontend/public. All Wikimedia Commons CC BY-SA, so the
-# attribution has to reach the UI -- see PlaceImage#credit.
-csv_rows(DATA.join("place_images.csv")).each do |row|
-  place = Place.find_by(external_id: row["place_id"])
-  next unless place
-
-  image = PlaceImage.find_or_initialize_by(place: place, seq: row["seq"])
+# Images bundled under frontend/public. Commons CC BY-SA plus an open-web set
+# marked `unverified`; both need their attribution to reach the UI -- see
+# Image#credit and data/ATTRIBUTION.md.
+#
+# Places and stops share the images table but keep a CSV each, so either can
+# be corrected by hand without scrolling past the other.
+seed_image = lambda do |owner, row|
+  image = Image.find_or_initialize_by(imageable: owner, seq: row["seq"])
   image.assign_attributes(
     local_path:  row["local_path"],
     license:     row["license"],
     attribution: row["attribution"].presence,
     source_page: row["source_page"].presence,
-    bytes:       row["bytes"].presence
+    bytes:       row["bytes"].presence,
+    caption:     row["caption"].presence
   )
   image.save!
+end
+
+csv_rows(DATA.join("place_images.csv")).each do |row|
+  place = Place.find_by(external_id: row["place_id"])
+  seed_image.call(place, row) if place
+end
+
+csv_rows(DATA.join("stop_images.csv")).each do |row|
+  stop = Stop.find_by(gtfs_id: row["stop_id"])
+  seed_image.call(stop, row) if stop
 end
 
 # Operational notes -- the things a local would tell you that no fare table or
@@ -372,6 +446,12 @@ end
 # the Mobo market are covered by the researched data above.
 Place.where(coord_status: "illustrative").destroy_all
 
+# Same for the stops this file used to invent. S_MOBO_POBLACION was a second
+# "Mobo Poblacion" alongside the feed's S_MOBO_POB; S_MASBATE_BAY_MOBO was a
+# boarding bay no timetable ever used. The sample trip above points at the GTFS
+# ids now, so both are unreferenced.
+Stop.where(gtfs_id: %w[S_MOBO_POBLACION S_MASBATE_BAY_MOBO]).destroy_all
+
 # Survey respondents, and one recorded ride.
 local = User.find_or_create_by!(name: "Ana (local)") { |u| u.commuter_type = :local }
 User.find_or_create_by!(name: "Migs (traveller)") { |u| u.commuter_type = :traveller }
@@ -393,3 +473,4 @@ History.find_or_create_by!(user: local, trip: trip)
     island.description = attributes[:description]
   end
 end
+User.create!(email: 'admin@example.com', password: 'password', password_confirmation: 'password') if Rails.env.development?

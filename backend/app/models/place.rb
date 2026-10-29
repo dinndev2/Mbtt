@@ -13,11 +13,23 @@ class Place < ApplicationRecord
   has_many :place_access_legs, dependent: :destroy
   has_many :fare_legs, through: :place_access_legs
   has_many :place_fees, dependent: :destroy
-  has_many :place_images, dependent: :destroy
+  has_many :images, as: :imageable, dependent: :destroy
+  # The admin form sends new photos and removals here. A blank upload row is
+  # dropped rather than failing the whole save on a missing file.
+  accepts_nested_attributes_for :images,
+    allow_destroy: true,
+    reject_if: ->(attributes) { attributes["id"].blank? && attributes["image"].blank? }
+
+  # Number new photos after the existing ones. Done here, not per image, because
+  # several arrive together and would each read the same max from the database.
+  before_validation do
+    next_seq = images.map(&:seq).compact.max.to_i
+    images.each { |image| image.seq ||= (next_seq += 1) }
+  end
 
   scope :surveyed,     -> { where(coord_status: "verified") }
   scope :needs_survey, -> { where(coord_status: %w[needs_survey town_centroid]) }
-  scope :with_images,  -> { where(id: PlaceImage.select(:place_id)) }
+  scope :with_images,  -> { where(id: Image.where(imageable_type: "Place").select(:imageable_id)) }
   scope :on_island,    ->(island) { where("LOWER(island) = ?", island.to_s.downcase) }
 
   # How well known a place is, measured as published coverage. Nothing here

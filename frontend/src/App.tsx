@@ -1,11 +1,13 @@
-import { useState, useEffect } from 'react'
-import { Display, Muted } from './ui/Text'
+import { useState, useEffect, useMemo, useContext, createContext } from 'react'
 import { useSearchParams } from "react-router";
 import { Island } from './components/Island/Island';
-import  IslandMap from './components/Island/IslandMap'
-import { toIslandKey } from './components/Island/island-paths';
-import { Search } from './components/Search/Search';
 import DynamicIsland from './components/Island/DynamicIsland';
+import IslandSelector from './components/Island/IslandSelector';
+import { Display, Loader, Muted } from './ui';
+import PlaceModalContent from './components/Place/PlaceModalContent';
+import Modal from './components/Modal';
+import "leaflet/dist/leaflet.css";
+
 export type CategoryItem = {
   id: number
   name: string
@@ -19,21 +21,62 @@ export type VihicleItem = {
   route_type: 'road' | 'ferry'
 }
 
+/**
+ * gateway - an inter-island port. terminal - land transport.
+ * jump_off - where a ride or boat is arranged. landing - where one drops you.
+ */
+export type StopRole = 'gateway' | 'terminal' | 'jump_off' | 'landing'
+
+/**
+ * A terminal, as something to preview before travelling to it.
+ *
+ * Most fields come from data/stops.csv, not the GTFS feed, which has nowhere
+ * to record that Aroroy is not a RoRo port or that San Jacinto is daytime
+ * navigation only - both decide whether a crossing is possible at all.
+ * Thirteen of the thirty-four stops carry nothing but a role, and those nulls
+ * are the honest record of what is published about a roadside arch.
+ */
 export type StopItem = {
   id: number
   gtfs_id: string
   name: string
+  description: string | null
+  /** Which island the terminal is on. Derived from its GTFS zone. */
+  island: string | null
+  role: StopRole | null
   latitude: number | null
   longitude: number | null
+  /** PPA, LGU or private - who to ask when a timetable is wrong. */
+  port_authority: string | null
+  /** A daytime-only port has no evening crossing, however late the operator runs. */
+  navigation: 'daytime' | 'day_and_night' | null
+  serves: string[]
+  operators: string[]
+  facilities: string[]
+  ticketing: string | null
+  arrive_before_min: number | null
+  notes: string | null
+  /** Null where nothing about this stop was researched. */
+  detail: { confidence: Confidence; as_of: string | null; source_url: string | null } | null
+  /**
+   * Photos from data/stop_images.csv. Only on `bundle.stops` - a stop nested
+   * under a place or a transfer comes without them, so look the stop up with
+   * useStop() rather than reading them off the nested copy.
+   */
+  images?: ImageItem[]
 }
 
-export type PlaceImageItem = {
+/** A photo of a place or a stop. Both come from the one images table. */
+export type ImageItem = {
   url: string
+  id: number
   license: string
   attribution: string | null
   source_page: string | null
   /** Must be displayed wherever the photo is - all images are CC BY-SA. */
   credit: string
+  /** What it shows. Set on stop photos, where a poblacion shot is the town and not the pier. */
+  caption: string | null
 }
 
 /** How a fare is charged. per_boat is split across the party; per_person is not. */
@@ -53,11 +96,27 @@ export type LegSchedule = {
   note: string | null
 }
 
+/** How a hop's times are expressed. `window` is a service that leaves when it
+ *  fills - operating hours, never departures. Inventing departures for one is
+ *  the failure that strands someone. */
+export type ScheduleKind = 'departures' | 'window' | 'on_demand' | 'unknown'
+
 export type FareLegItem = {
   id: string
   mode: string | null
+  /**
+   * Which way round the hop is being ridden. A leg is stored one way, but a
+   * crossing *towards* Masbate City rides the same row backwards - `from`,
+   * `to` and `departures` already account for it, so just render them.
+   */
+  direction: 'out' | 'back'
   from: string | null
   to: string | null
+  from_island: string | null
+  to_island: string | null
+  /** Look these up in `bundle.stops` for the terminal detail. */
+  from_stop_id: string | null
+  to_stop_id: string | null
   amount_min_php: number | null
   amount_max_php: number | null
   basis: FareBasis
@@ -68,7 +127,112 @@ export type FareLegItem = {
   valid_as_of: string | null
   source_url: string | null
   notes: string | null
+  /** HH:MM, earliest first, for the direction ridden. Empty unless `schedule_kind` is 'departures'. */
+  departures: string[]
+  service_start: string | null
+  service_end: string | null
+  headway_min: number | null
+  schedule_kind: ScheduleKind
   schedule: LegSchedule | null
+}
+
+/**
+ * The gap between where one crossing lands and where the next hop leaves.
+ * Null when they are the same pier. `same_zone` is the difference between a
+ * tricycle across town and a second journey: Masbate City Port to Rendezvous
+ * Beach is the first, Masbate City Port to Mobo Port is the second.
+ */
+export type TransferItem = {
+  arrive_at: StopItem | null
+  depart_from: StopItem | null
+  same_zone: boolean
+  /** False when nothing in the dataset joins the two stops. */
+  researched: boolean
+  link: FareLegItem | null
+}
+
+/** One island boundary and every researched way across it, best first. */
+export type ConnectionStep = {
+  from_island: string
+  to_island: string
+  transfer: TransferItem | null
+  crossings: FareLegItem[]
+}
+
+/**
+ * How to get from the island the traveller is standing on to the island a
+ * place's access chain starts from. Null when they are already there, which
+ * is the common case. Deliberately NOT folded into the estimate's total:
+ * getting to the island and getting to the place are two decisions, and one
+ * unresearched crossing would otherwise drag a solid estimate to `unknown`.
+ */
+export type IslandConnectionItem = {
+  from_island: string
+  to_island: string
+  reachable: boolean
+  hops: number
+  /** The crossings connect only on paper - render this, it is the difference
+   *  between a journey and a pair of ferries. */
+  has_unresearched_transfer: boolean
+  steps: ConnectionStep[]
+  arrival_transfer: TransferItem | null
+}
+
+/**
+ * Where a last-trip figure came from, and therefore how much weight it bears.
+ *
+ * `collected` - somebody asked at the pier. The gold standard.
+ * `timetable` - read off a published schedule that is trusted.
+ * `round_trip` - chartered, so it waits. There is no last trip to miss.
+ * `unknown`   - nobody knows. Never render this as a time.
+ */
+export type LastTripBasis = 'collected' | 'timetable' | 'round_trip' | 'unknown'
+
+export type ReturnHop = {
+  leg_id: string
+  mode: string | null
+  board_at: string | null
+  board_stop_id: string | null
+  to: string | null
+  duration_min: number | null
+  last_departure: string | null
+  overnight: boolean
+  basis: LastTripBasis
+  confidence: Confidence
+  source_url: string | null
+  note: string | null
+}
+
+/**
+ * The last moment you can leave and still get home today.
+ *
+ * This answers the question behind the fear of travelling here - not getting
+ * lost, but getting stranded. Three states must never be collapsed into each
+ * other:
+ *
+ *   same_day === false  you cannot get back today
+ *   same_day === null   nobody knows, so go and ask at the terminal
+ *   no_deadline         you chartered the boat and it waits
+ */
+export type ReturnTripItem = {
+  /** HH:MM. Null when nothing on the way home runs to a timetable we trust. */
+  latest_start: string | null
+  latest_start_min: number | null
+  earliest_arrival: string | null
+  time_there_min: number | null
+  /** null means "we cannot tell" and must never be rendered as "no". */
+  same_day: boolean | null
+  no_deadline: boolean
+  /** The only way back is tomorrow morning. */
+  overnight: boolean
+  complete: boolean
+  /** The single hop that decides the day. Worth naming, so it can be checked. */
+  binding: ReturnHop | null
+  /** Hops where nobody knows the last departure - the questions to ask. */
+  unknown: ReturnHop[]
+  /** Hops that cannot be ridden backwards at all: a distance band, a habal-habal. */
+  unmodelled: ReturnHop[]
+  hops: ReturnHop[]
 }
 
 export type FareFeeItem = {
@@ -99,6 +263,13 @@ export type FareEstimateItem = {
   group_sensitive: boolean
   confidence: Confidence
   oldest_source: string | null
+  /** The island this way in assumes you are starting from. */
+  origin_island: string | null
+  /** You are already on the destination island and only the gate is left to pay. */
+  local: boolean
+  connection: IslandConnectionItem | null
+  /** When the last way home goes, and which hop decides it. */
+  return_trip: ReturnTripItem | null
   legs: FareLegItem[]
   fees: FareFeeItem[]
 }
@@ -120,10 +291,11 @@ export type Prominence = {
 export type PlaceItem = {
   id: number
   external_id: string
-  name: string
+  original: boolean
+  name: string | undefined
   description: string | null
-  latitude: number | null
-  longitude: number | null
+  latitude: number
+  longitude: number
   municipality: string | null
   island: string | null
   coord_status: string | null
@@ -136,7 +308,7 @@ export type PlaceItem = {
   categories: CategoryItem[]
   vihicles: VihicleItem[]
   stop: StopItem | null
-  images: PlaceImageItem[]
+  images: ImageItem[]
   fare_estimates: FareEstimateItem[]
 }
 
@@ -147,16 +319,6 @@ export type AdvisoryKind =
 /** info: worth knowing. plan: changes what you book. warn: could strand you. */
 export type AdvisorySeverity = 'info' | 'plan' | 'warn'
 
-/**
- * A hand-written operational note - the thing a local would tell you that no
- * fare table or timetable holds.
- *
- * Every one of these is a claim about how things *usually* are, never about
- * right now, which is what lets them ship in the bundle and stay true offline.
- * There is deliberately no server-computed "applies today" flag: the client
- * owns the clock and may be days offline, so it evaluates the season itself
- * with `isInSeason` below.
- */
 export type AdvisoryItem = {
   id: string
   scope: AdvisoryScope
@@ -194,6 +356,8 @@ export type IslandItem = {
 
 export type BundleMeta = {
   pax: number
+  /** Where the traveller is. Not a filter - see the bundles controller. */
+  from_island: string | null
   island: string | null
   currency: 'PHP'
   data_quality: 'researched'
@@ -208,61 +372,139 @@ export type Bundle = {
   categories: Category
   places: Place
   islands: Island
+  /** The terminal directory, sent once and referenced by id from every leg. */
+  stops: StopItem[]
   /** Already scoped to the island when the request carried one. Sorted warn-first. */
   advisories: AdvisoryItem[]
   meta: BundleMeta
 }
 
-function App() {
+type ModalContentContextType = {
+  closePlaceModal: () => void
+  openPlaceModal: () => void
+  placeModal: boolean
+}
+
+
+export const ModalContext = createContext<ModalContentContextType | null>(null)
+
+/**
+ * The terminal directory, keyed by gtfs_id. The bundle sends it once and legs
+ * reference it by id, so anything rendering a pier can look up what is there
+ * without the stop being nested into every leg it appears on.
+ */
+export const StopsContext = createContext<Map<string, StopItem>>(new Map())
+
+export function useStop(gtfsId: string | null | undefined): StopItem | null {
+  const stops = useContext(StopsContext)
+  return gtfsId ? stops.get(gtfsId) ?? null : null
+}
+const API_URL = import.meta.env.VITE_API_URL;
+const API = `${API_URL}/bundles`
+
+function App() { 
   const [bundle, setBundle ] = useState<Bundle>()
   const [islandParams, setIslandParams] = useSearchParams();
-  const islandQuery = islandParams.get('island') 
-  const handleSetIslandParams = (island: string) => {
-    setIslandParams({ island: island.toLocaleLowerCase()})
+  const [loading, setLoading] = useState(true)
+  const [islandSelectorVisibility, setIslandSelectorVisibility] = useState(false)
+  const savedId = islandParams.get('id')
+  const [currentSelectedPlace, setCurrentSelectedPlace] = useState<PlaceItem | null>(null)
+  // The island the traveller is on. `island` in the URL, because that is what
+  // the selector, the search and the island buttons all read.
+  const fromIsland = islandParams.get('island') || "masbate"
+  const [placeModal, setPlaceModal] = useState(false)
+  const stopsById = useMemo(
+    () => new Map((bundle?.stops ?? []).map((stop) => [stop.gtfs_id, stop])),
+    [bundle],
+  )
+
+  async function fetchBundle(from: string) {
+    try {
+      const url = new URL(API)
+      url.searchParams.set('from', from)
+      const data = await fetch(url, { method: 'GET' })
+      setBundle(await data.json())
+      if(data) {
+        setLoading(false)
+      }
+    }
+    catch(e) {
+      console.log('something went wrong', e)
+    }
   }
 
-  async function fetchCategories() {
-    const data = await fetch('http://localhost:3000/api/v1/bundles', {
-      method: 'GET'
+  useEffect(() => {
+    if (islandParams.get('island')) return
+    setIslandParams((params) => {
+      params.set('island', fromIsland)
+      return params
+    }, { replace: true })
+  }, [islandParams])
+
+  useEffect(() => {
+    fetchBundle(fromIsland)
+  }, [fromIsland])
+
+  useEffect(() => {
+    if (!bundle) return
+
+    const openId = savedId ?? currentSelectedPlace?.id
+    if (!openId) return
+
+    const place = bundle.places.find((place) => String(place.id) === String(openId))
+    if (place) setCurrentSelectedPlace(place)
+    if (savedId) openPlaceModal()
+  }, [bundle])
+
+  const closePlaceModal = () => {
+    setPlaceModal(false)
+    setIslandParams(
+      (params) => {
+      params.delete('id')
+      return params
     })
-    const bundleData = await data.json()
-    setBundle(bundleData)
   }
-  useEffect(() => { 
-    fetchCategories()
-  }, [])
 
-  return (
-    <div>
-      {/* One column on phones, two side by side from lg. `min-h-dvh` rather
-          than `h-screen` so mobile browser chrome doesn't crop the page. */}
-      <DynamicIsland />
-      {/* {bundle && <Search bundle={bundle} />} */}
-      {/* island switch (modal) */}
-      <div className="mx-auto flex w-full max-w-6xl flex-col items-center justify-center gap-6 px-5 py-8 sm:px-8 sm:py-12 lg:h-dvh lg:max-w-none lg:flex-row lg:gap-10 lg:p-20">
-        <div className="flex w-full items-center justify-center lg:w-1/2">
-          <IslandMap
-            className="max-w-[15rem] sm:max-w-xs lg:max-w-md"
-            onSelect={handleSetIslandParams}
-            selected={toIslandKey(islandQuery)}
-          />
-        </div>
-        <div className="w-full lg:w-1/2">
-          <Display className='lg:font-medium' size={"xxl"} >
-            Which island
-            <br/>
-            are you on?
-          </Display>
-          <Muted className='my-2 max-w-prose' >
-            Fares, terminals and crossings differ by island. Pick one to start
-            {/* Hard break only where the line is wide enough to want one. */}
-            <br className="hidden lg:inline" /> you can switch any time.
-          </Muted>
-          <Island handleSetIslandParams={handleSetIslandParams} islands={bundle?.islands} />
-        </div>
-      </div>
-    </div>
+  const openPlaceModal = () => {
+    setPlaceModal(true)
+  }
+
+  const openIslandModal = () => {
+    setIslandSelectorVisibility(true)
+  }
+
+  const closeIslandModal = () => {
+    setIslandSelectorVisibility(false)
+  }
+
+
+
+  return ( 
+    <>
+      {bundle && !loading ? 
+        <>
+          <StopsContext value={stopsById}>
+          <ModalContext value={{openPlaceModal: openPlaceModal, placeModal: placeModal, closePlaceModal: closePlaceModal}}>
+            <div className="flex flex-col gap-4 mx-auto w-full max-w-7xl px-4 py-8 sm:p-10 items-start min-h-dvh">
+              <Display as="h1" size="xxl">
+                Where in Masbate
+                are you <em>headed?</em>
+              </Display>
+              <Muted className='text-left hidden lg:block mb-4' size="lg">
+                Masbate, Ticao or Burias - start from the island you're on. We show the boat or
+                ride, what it costs, where to board, and the last trip back.
+              </Muted>
+                {<DynamicIsland openIslandModal={openIslandModal} places={bundle.places} setCurrentSelectedPlace={setCurrentSelectedPlace} currentSelectedPlace={currentSelectedPlace} />}
+            </div>
+          </ModalContext>
+          {(islandSelectorVisibility) && <Modal closePlaceModal={closeIslandModal}><IslandSelector bundle={bundle} /></Modal>}
+          {(placeModal && currentSelectedPlace) && <Modal closePlaceModal={closePlaceModal}><PlaceModalContent currentSelectedPlace={currentSelectedPlace} /></Modal> }
+          </StopsContext>
+        </>
+      : <Loader fullscreen label="Charting the crossings" /> }
+    </>
   )
 }
 
 export default App
+

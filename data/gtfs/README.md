@@ -217,8 +217,8 @@ For a frequency-based trip the actual clock times don't matter, but the
 round time and lay out realistic travel times from there.
 
 ```csv
-R_JEEP_MASBATE_MOBO_DAILY_01,06:00:00,06:00:00,S_MASBATE_MARKET,10,0,0,1,0.0
-R_JEEP_MASBATE_MOBO_DAILY_01,06:25:00,06:25:00,S_MOBO_POBLACION,20,0,0,0,9.4
+R_JEEP_MASBATE_MOBO_DAILY_01,06:00:00,06:00:00,S_MASBATE_TERMINAL,10,0,0,1,0.0
+R_JEEP_MASBATE_MOBO_DAILY_01,06:25:00,06:25:00,S_MOBO_POB,20,0,0,0,9.4
 ```
 
 ### `frequencies.txt` — headway instead of a timetable
